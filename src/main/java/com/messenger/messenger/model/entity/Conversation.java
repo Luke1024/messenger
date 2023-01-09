@@ -14,4 +14,21 @@ public class Conversation {
     private long id;
     private List<User> users = new ArrayList<>();
     private List<MessageDto> messageDtos = new ArrayList<>();
+
+    public Conversation(List<User> users, List<MessageDto> messageDtos) {
+        this.users = users;
+        this.messageDtos = messageDtos;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public List<User> getUsers() {
+        return users;
+    }
+
+    public List<MessageDto> getMessageDtos() {
+        return messageDtos;
+    }
 }
