@@ -4,7 +4,7 @@ import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.entity.User;
 import com.messenger.messenger.repository.UserRepository;
 import com.messenger.messenger.service.TokenService;
-import com.messenger.messenger.service.UrlService;
+import com.messenger.messenger.service.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -21,7 +21,7 @@ public class AuthorizationService {
     private UserRepository userRepository;
 
     @Autowired
-    private UrlService urlService;
+    private SettingsService settingsService;
 
     @Autowired
     private TokenService tokenService;
@@ -48,7 +48,7 @@ public class AuthorizationService {
         if(request.getCookies() != null) {
             Cookie[] cookies = request.getCookies();
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(urlService.authKey)) {
+                if (cookie.getName().equals(settingsService.authKey)) {
                     return Optional.of(cookie.getValue());
                 }
             }

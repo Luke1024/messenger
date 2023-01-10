@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class RequestDto {
     private boolean loadNew;
-    private int loadEarlierPacked;
+    private int messagePackedCountToLoad;
     private long openedConversation;
     private LocalDateTime loadFrom;
 
@@ -13,7 +13,7 @@ public class RequestDto {
 
     public RequestDto(boolean loadNew, int loadEarlierPacked, long openedConversation, LocalDateTime loadFrom) {
         this.loadNew = loadNew;
-        this.loadEarlierPacked = loadEarlierPacked;
+        this.messagePackedCountToLoad = loadEarlierPacked;
         this.openedConversation = openedConversation;
         this.loadFrom = loadFrom;
     }
@@ -22,8 +22,8 @@ public class RequestDto {
         return loadNew;
     }
 
-    public int getLoadEarlierPacked() {
-        return loadEarlierPacked;
+    public int getMessagePackedCountToLoad() {
+        return messagePackedCountToLoad;
     }
 
     public long getOpenedConversation() {

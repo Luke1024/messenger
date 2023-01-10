@@ -1,23 +1,22 @@
 package com.messenger.messenger.model.entity;
 
-import com.messenger.messenger.model.dto.MessageDto;
-
+import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
 public class Conversation {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
-    private List<User> users = new ArrayList<>();
-    private List<MessageDto> messageDtos = new ArrayList<>();
+    private List<User> users;
+    private List<Message> messages = new ArrayList<>();
 
-    public Conversation(List<User> users, List<MessageDto> messageDtos) {
+    public Conversation(List<User> users) {
         this.users = users;
-        this.messageDtos = messageDtos;
     }
 
     public long getId() {
@@ -28,7 +27,7 @@ public class Conversation {
         return users;
     }
 
-    public List<MessageDto> getMessageDtos() {
-        return messageDtos;
+    public List<Message> getMessages() {
+        return messages;
     }
 }
