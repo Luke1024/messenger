@@ -1,24 +1,29 @@
 package com.messenger.messenger.model.entity;
 
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Message {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
     private String content;
-    private User watchedByUsers;
     private LocalDateTime send;
+    private List<User> watchedByUsers = new ArrayList<>();
+    private User byUser;
+    private Conversation conversation;
 
-    public Message(String content, User watchedByUsers, LocalDateTime send) {
+    public Message(String content, LocalDateTime send, User userBy, Conversation conversation) {
         this.content = content;
-        this.watchedByUsers = watchedByUsers;
         this.send = send;
+        this.byUser = userBy;
+        this.conversation = conversation;
     }
 
     public long getId() {
@@ -29,11 +34,23 @@ public class Message {
         return content;
     }
 
-    public User getWatchedByUsers() {
+    public LocalDateTime getSend() {
+        return send;
+    }
+
+    public void addUserSeen(User user){
+        watchedByUsers.add(user);
+    }
+
+    public List<User> getWatchedByUsers() {
         return watchedByUsers;
     }
 
-    public LocalDateTime getSend() {
-        return send;
+    public User getByUser() {
+        return byUser;
+    }
+
+    public Conversation getConversation() {
+        return conversation;
     }
 }

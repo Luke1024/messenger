@@ -20,8 +20,6 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-
-
     @PostMapping(value = "/update")
     public ResponseEntity<UpdateDto> getConversationUpdate(@RequestBody RequestDto requestDto, HttpServletRequest request){
         return messageService.update(requestDto, request);

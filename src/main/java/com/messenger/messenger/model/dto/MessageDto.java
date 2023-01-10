@@ -5,14 +5,14 @@ import java.time.LocalDateTime;
 public class MessageDto {
     private long conversationId;
     private LocalDateTime send;
-    private String message;
+    private String content;
 
     public MessageDto() { }
 
-    public MessageDto(long conversationId, LocalDateTime send, String message) {
+    public MessageDto(long conversationId, LocalDateTime send, String content) {
         this.conversationId = conversationId;
         this.send = send;
-        this.message = message;
+        this.content = content;
     }
 
     public long getConversationId() {
@@ -23,7 +23,7 @@ public class MessageDto {
         return send;
     }
 
-    public String getMessage() {
-        return message;
+    public String getContent() {
+        return content;
     }
 }

@@ -27,6 +27,10 @@ public class Conversation {
         return users;
     }
 
+    public void addMessage(Message message){
+        messages.add(message);
+    }
+
     public List<Message> getMessages() {
         return messages;
     }

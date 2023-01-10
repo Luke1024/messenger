@@ -3,7 +3,7 @@ package com.messenger.messenger.model.dto;
 import java.time.LocalDateTime;
 
 public class RequestDto {
-    private boolean loadNew;
+    private boolean loadFromSelectedTime;
     private int messagePackedCountToLoad;
     private long openedConversation;
     private LocalDateTime loadFrom;
@@ -11,15 +11,15 @@ public class RequestDto {
     public RequestDto() {
     }
 
-    public RequestDto(boolean loadNew, int loadEarlierPacked, long openedConversation, LocalDateTime loadFrom) {
-        this.loadNew = loadNew;
+    public RequestDto(boolean loadFromSelectedTime, int loadEarlierPacked, long openedConversation, LocalDateTime loadFrom) {
+        this.loadFromSelectedTime = loadFromSelectedTime;
         this.messagePackedCountToLoad = loadEarlierPacked;
         this.openedConversation = openedConversation;
         this.loadFrom = loadFrom;
     }
 
-    public boolean isLoadNew() {
-        return loadNew;
+    public boolean isLoadFromSelectedTime() {
+        return loadFromSelectedTime;
     }
 
     public int getMessagePackedCountToLoad() {
