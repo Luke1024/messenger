@@ -1,7 +1,7 @@
 package com.messenger.messenger.service.message;
 
 import com.messenger.messenger.model.dto.MessageDto;
-import com.messenger.messenger.model.entity.Conversation;
+import com.messenger.messenger.model.entity.conversation.Conversation;
 import com.messenger.messenger.model.entity.Message;
 import com.messenger.messenger.model.entity.User;
 import com.messenger.messenger.repository.ConversationRepository;

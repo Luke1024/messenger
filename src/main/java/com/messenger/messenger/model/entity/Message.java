@@ -1,9 +1,9 @@
 package com.messenger.messenger.model.entity;
 
 
+import com.messenger.messenger.model.entity.conversation.Conversation;
+
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,6 +24,10 @@ public class Message {
         this.send = send;
         this.byUser = userBy;
         this.conversation = conversation;
+    }
+
+    public void setId(long id){
+        this.id = id;
     }
 
     public long getId() {
