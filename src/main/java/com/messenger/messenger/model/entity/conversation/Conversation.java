@@ -1,6 +1,8 @@
 package com.messenger.messenger.model.entity.conversation;
 
+import com.messenger.messenger.model.dto.ConversationStatusDto;
 import com.messenger.messenger.model.entity.Message;
+import com.messenger.messenger.model.entity.MessageBatch;
 import com.messenger.messenger.model.entity.User;
 
 import java.util.ArrayList;
@@ -12,10 +14,10 @@ import java.util.stream.Collectors;
 public class Conversation {
     private long id;
     private List<ManagedUser> managedUsers;
-    private List<Message> messages = new ArrayList<>();
+    private List<MessageBatch> messageBatches = new ArrayList<>();
 
     private MessageDistributionService distributionService =
-            new MessageDistributionService(this, managedUsers, messages);
+            new MessageDistributionService(this, managedUsers, messageBatches);
 
     public Conversation(long id, List<User> users) {
         this.managedUsers = createManagedUsers(users);
@@ -35,25 +37,57 @@ public class Conversation {
 
     //this is used only when current conversation is open
     public Optional<List<Message>> getOnlyNewMessages(User user){
-        return distributionService.getNewMessages(user);
+        Optional<ManagedUser> userManagementData = requestUserManagementData(user);
+        if(userManagementData.isPresent()) {
+            return Optional.of(distributionService.getOnlyNewMessages(user));
+        } else {
+            return Optional.empty();
+        }
     }
 
-    public Optional<List<Message>> getMessages(User user, int fromIndex, int toIndex) {
-        return distributionService.getMessages(user, messageCount);
+    public Optional<List<Message>> getMessages(User user, int batchIndex) {
+        Optional<ManagedUser> userManagementData = requestUserManagementData(user);
+        if(userManagementData.isPresent()) {
+            return Optional.of(distributionService.getMessages(user, batchIndex));
+        } else {
+            return Optional.empty();
+        }
     }
 
-    public long getMessagesAvailableCount(){
-        return messages.size();
+    public Optional<ConversationStatusDto> getConversationStatus(User user){
+        Optional<ManagedUser> managedUser = requestUserManagementData(user);
+        if(managedUser.isPresent()){
+            return Optional.of(processToConversationDto(managedUser.get()));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    private ConversationStatusDto processToConversationDto(ManagedUser managedUser){
+        return new ConversationStatusDto(
+                id,
+                managedUsers.stream()
+                        .filter(user -> user.getUser() != managedUser.getUser())
+                        .map(user -> user.getUser().getDto()).collect(Collectors.toList()),
+                managedUser.notificationCount);
+    }
+
+    private Optional<ManagedUser> requestUserManagementData(User user){
+        for(ManagedUser managedUser : managedUsers){
+            if(managedUser.getUser() == user) {
+                return Optional.of(managedUser);
+            }
+        }
+        return Optional.empty();
     }
 
     class ManagedUser {
         private User user;
-        private List<Message> waitingMessages;
+        private List<Message> waitingMessages = new ArrayList<>();
         private int notificationCount;
 
-        public ManagedUser(User user, List<Message> waitingMessages) {
+        public ManagedUser(User user) {
             this.user = user;
-            this.waitingMessages = waitingMessages;
         }
 
         public User getUser() {

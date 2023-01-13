@@ -26,8 +26,4 @@ public class ConversationStatusDto {
     public int getWaitingMessages() {
         return waitingMessages;
     }
-
-    public void addWaitingMessage(){
-
-    }
 }

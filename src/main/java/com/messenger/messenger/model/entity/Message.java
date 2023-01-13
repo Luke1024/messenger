@@ -18,12 +18,14 @@ public class Message {
     private List<User> watchedByUsers = new ArrayList<>();
     private User byUser;
     private Conversation conversation;
+    private MessageBatch messageBatch;
 
-    public Message(String content, LocalDateTime send, User userBy, Conversation conversation) {
+    public Message(String content, LocalDateTime send, User userBy, Conversation conversation, MessageBatch messageBatch) {
         this.content = content;
         this.send = send;
         this.byUser = userBy;
         this.conversation = conversation;
+        this.messageBatch = messageBatch;
     }
 
     public void setId(long id){
@@ -56,5 +58,9 @@ public class Message {
 
     public Conversation getConversation() {
         return conversation;
+    }
+
+    public MessageBatch getMessageBatch() {
+        return messageBatch;
     }
 }

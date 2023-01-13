@@ -4,33 +4,27 @@ import java.time.LocalDateTime;
 
 public class RequestDto {
     private boolean loadNew;
-    private int messagePackedIndex;
+    private int messageBatchIndex;
     private long openedConversation;
-    private LocalDateTime loadFrom;
 
     public RequestDto() {
     }
 
-    public RequestDto(boolean loadNew, int loadEarlierPacked, long openedConversation, LocalDateTime loadFrom) {
+    public RequestDto(boolean loadNew, int loadEarlierPacked, long openedConversation) {
         this.loadNew = loadNew;
-        this.messagePackedIndex = loadEarlierPacked;
+        this.messageBatchIndex = loadEarlierPacked;
         this.openedConversation = openedConversation;
-        this.loadFrom = loadFrom;
     }
 
     public boolean isLoadNew() {
         return loadNew;
     }
 
-    public int getMessagePackedIndex() {
-        return messagePackedIndex;
+    public int getMessageBatchIndex() {
+        return messageBatchIndex;
     }
 
     public long getOpenedConversation() {
         return openedConversation;
-    }
-
-    public LocalDateTime getLoadFrom() {
-        return loadFrom;
     }
 }

@@ -1,7 +1,9 @@
 package com.messenger.messenger.model.entity.conversation;
 
 import com.messenger.messenger.model.entity.Message;
+import com.messenger.messenger.model.entity.MessageBatch;
 import com.messenger.messenger.model.entity.User;
+import com.messenger.messenger.service.SettingsService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,27 +13,29 @@ public class MessageDistributionService {
 
     private Conversation conversation;
     private List<Conversation.ManagedUser> managedUsers;
-    private List<Message> messages;
+    private List<MessageBatch> messageBatches;
+
+    private SettingsService settingsService = new SettingsService();
 
     public MessageDistributionService(Conversation conversation,
                                       List<Conversation.ManagedUser> managedUsers,
-                                      List<Message> messages) {
+                                      List<MessageBatch> messageBatches) {
         this.conversation = conversation;
         this.managedUsers = managedUsers;
-        this.messages = messages;
+        this.messageBatches = messageBatches;
     }
 
     public void addMessage(Message message){
         setId(message);
-        messages.add(message);
+        messageBatches.add(message);
         informUsers(message);
     }
 
     private void setId(Message message){
-        if(messages.isEmpty()){
+        if(messageBatches.isEmpty()){
             message.setId(0);
         } else {
-            long newId = messages.get(messages.size()-1).getId() + 1;
+            long newId = messageBatches.get(messageBatches.size()-1).getId() + 1;
             message.setId(newId);
         }
     }
@@ -46,19 +50,19 @@ public class MessageDistributionService {
         managedUser.addWaitingMessage(message);
     }
 
-    public Optional<List<Message>> getOnlyNewMessages(User user){
+    public List<Message> getOnlyNewMessages(User user){
         for(Conversation.ManagedUser managedUser : managedUsers){
             if(managedUser.getUser() == user){
                 List<Message> waitingMessages = new ArrayList<>();
                 waitingMessages.addAll(managedUser.getWaitingMessages());
                 managedUser.clearWaitingMessages();
-                return Optional.of(waitingMessages);
+                return waitingMessages;
             }
         }
-        return Optional.empty();
+        return new ArrayList<>();
     }
 
-    public Optional<List<Message>> getMessages(){
-
+    public List<Message> getMessages(User user, int batchIndex){
+        return ;
     }
 }

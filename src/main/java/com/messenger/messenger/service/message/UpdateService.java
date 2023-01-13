@@ -33,16 +33,24 @@ public class UpdateService {
     @Autowired
     private MessageRepository messageRepository;
 
-    public UpdateDto update(RequestDto requestDto){
+    public UpdateDto update(RequestDto requestDto, User user){
         if(requestDto.isLoadNew()){
-            return loadNewOnly(requestDto);
+            return loadNewOnly(requestDto, user);
         } else {
-            return loadMessagePack(requestDto);
+            return loadMessagePack(requestDto, user);
         }
     }
 
-    private UpdateDto loadNewOnly(RequestDto requestDto){
+    private UpdateDto loadNewOnly(RequestDto requestDto, User user){
+        List<ConversationStatusDto> conversationStatusDtos = new ArrayList<>();
+        List<MessageDto> messageDtos = new ArrayList<>();
 
+        Optional<Conversation> optionalConversation = getConversation(requestDto.getOpenedConversation());
+        if(optionalConversation.isPresent()) {
+            messageDtos = messageMapper.mapToDtoList(optionalConversation.get()
+                    .getOnlyNewMessages(user));
+        }
+        return new UpdateDto(conversationStatusDtos, messageDtos);
     }
 
     private UpdateDto loadMessagePack(RequestDto requestDto, User user){
@@ -58,14 +66,13 @@ public class UpdateService {
     }
 
     private List<MessageDto> loadRequestedMessages(Conversation conversation, RequestDto requestDto){
-        int messageCount = getMessageCount(requestDto.getMessagePackedIndex());
+        int messageCount = getMessageCount(requestDto.getMessageBatchIndex());
         return getLastMessages(conversation, messageCount);
     }
 
-    private List<MessageDto> getLastMessages(Conversation conversation, int messageCount){
-        return messageMapper.mapToDtoList(conversation.getMessages().subList(messageCount, conversation.getMessages().size()-1));
+    private List<MessageDto> getLastMessages(Conversation conversation, int indexFrom, int indexTo){
+        return messageMapper.mapToDtoList(conversation.getMessages(user, indexFrom, indexTo));
     }
-
 
     private int getMessageCount(int messagePackedCountToLoad){
         return messagePackedCountToLoad * settingsService.messageCountInPacked;
