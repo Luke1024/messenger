@@ -20,12 +20,11 @@ public class Message {
     private Conversation conversation;
     private MessageBatch messageBatch;
 
-    public Message(String content, LocalDateTime send, User userBy, Conversation conversation, MessageBatch messageBatch) {
+    public Message(String content, LocalDateTime send, User userBy, Conversation conversation) {
         this.content = content;
         this.send = send;
         this.byUser = userBy;
         this.conversation = conversation;
-        this.messageBatch = messageBatch;
     }
 
     public void setId(long id){
@@ -62,5 +61,9 @@ public class Message {
 
     public MessageBatch getMessageBatch() {
         return messageBatch;
+    }
+
+    public void setMessageBatch(MessageBatch messageBatch) {
+        this.messageBatch = messageBatch;
     }
 }

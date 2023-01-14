@@ -17,7 +17,7 @@ public class SenderService {
     @Autowired
     private ConversationRepository conversationRepository;
 
-    public ResponseEntity<Boolean> send(MessageDto messageDto, User user){
+    public boolean send(MessageDto messageDto, User user){
         Optional<Conversation> optionalConversation = conversationRepository.findById(messageDto.getConversationId());
         if(optionalConversation.isPresent()){
             optionalConversation.get().addMessage(new Message(
@@ -26,6 +26,7 @@ public class SenderService {
                     user,
                     optionalConversation.get())
             );
-        }
+            return true;
+        } else return false;
     }
 }

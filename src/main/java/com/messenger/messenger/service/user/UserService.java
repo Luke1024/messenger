@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,6 +26,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private List<User> users = new ArrayList<>();
 
     public ResponseEntity<Boolean> ping(HttpServletRequest request){
         return authorizationService.cookieCheck(request);
@@ -45,6 +48,19 @@ public class UserService {
         } else {
             return ResponseEntity.badRequest().build();
         }
+    }
+
+    public List<User> findUsersByDto(List<UserDto> userDtos){
+        List<User> users = new ArrayList<>();
+        for(UserDto userDto : userDtos){
+            Optional<User> optionalUser = userRepository.findById(userDto.getUserId());
+            if(optionalUser.isPresent()){
+                if(optionalUser.get().getName().equals(userDto.getUserName())){
+                    users.add(optionalUser.get());
+                }
+            }
+        }
+        return users;
     }
 
     private List<UserDto> findUsers(String userName){

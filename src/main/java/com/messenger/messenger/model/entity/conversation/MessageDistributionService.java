@@ -26,17 +26,39 @@ public class MessageDistributionService {
     }
 
     public void addMessage(Message message){
-        setId(message);
-        messageBatches.add(message);
+        MessageBatch currentBatch = getCurrentBatch();
+
+        configureMessage(currentBatch,message);
+        currentBatch.getMessages().add(message);
         informUsers(message);
     }
 
-    private void setId(Message message){
+    private MessageBatch getCurrentBatch(){
         if(messageBatches.isEmpty()){
+            MessageBatch newMessageBatch = new MessageBatch(0, new ArrayList<>());
+            return newMessageBatch;
+        }
+        if( ! messageBatches.isEmpty()){
+            MessageBatch lastMessageBatch = messageBatches.get(messageBatches.size()-1);
+            if(lastMessageBatch.getMessages().size() > settingsService.messageCountInBatch-1){
+                return new MessageBatch(generateBatchId(), new ArrayList<>());
+            }
+        }
+        return messageBatches.get(messageBatches.size()-1);
+    }
+
+    private long generateBatchId(){
+        return messageBatches.get(messageBatches.size()-1).getId()+1;
+    }
+
+    private void configureMessage(MessageBatch messageBatch ,Message message){
+        if(messageBatch.getMessages().isEmpty()){
             message.setId(0);
         } else {
-            long newId = messageBatches.get(messageBatches.size()-1).getId() + 1;
+            List<Message> messages = messageBatch.getMessages();
+            long newId = messages.get(messages.size()-1).getId() + 1;
             message.setId(newId);
+            message.setMessageBatch(messageBatch);
         }
     }
 
@@ -62,7 +84,15 @@ public class MessageDistributionService {
         return new ArrayList<>();
     }
 
-    public List<Message> getMessages(User user, int batchIndex){
-        return ;
+    public int getCurrentBatchIndex(){
+        return messageBatches.size()-1;
+    }
+
+    public Optional<MessageBatch> getMessages(int batchIndex){
+        if(batchIndex >= 0){
+            return Optional.of(messageBatches.get(batchIndex));
+        } else {
+            return Optional.empty();
+        }
     }
 }

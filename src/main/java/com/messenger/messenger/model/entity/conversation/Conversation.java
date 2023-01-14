@@ -36,19 +36,19 @@ public class Conversation {
     }
 
     //this is used only when current conversation is open
-    public Optional<List<Message>> getOnlyNewMessages(User user){
+    public List<Message> getOnlyNewMessages(User user){
         Optional<ManagedUser> userManagementData = requestUserManagementData(user);
         if(userManagementData.isPresent()) {
-            return Optional.of(distributionService.getOnlyNewMessages(user));
+            return distributionService.getOnlyNewMessages(user);
         } else {
-            return Optional.empty();
+            return new ArrayList<>();
         }
     }
 
-    public Optional<List<Message>> getMessages(User user, int batchIndex) {
+    public Optional<MessageBatch> getMessageBatch(User user, int batchIndex) {
         Optional<ManagedUser> userManagementData = requestUserManagementData(user);
         if(userManagementData.isPresent()) {
-            return Optional.of(distributionService.getMessages(user, batchIndex));
+            return distributionService.getMessages(batchIndex);
         } else {
             return Optional.empty();
         }

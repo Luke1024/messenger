@@ -4,6 +4,7 @@ import com.messenger.messenger.model.dto.MessageDto;
 import com.messenger.messenger.model.dto.ConversationStatusDto;
 import com.messenger.messenger.model.dto.RequestDto;
 import com.messenger.messenger.model.dto.UpdateDto;
+import com.messenger.messenger.model.entity.MessageBatch;
 import com.messenger.messenger.model.entity.conversation.Conversation;
 import com.messenger.messenger.model.entity.User;
 import com.messenger.messenger.repository.MessageRepository;
@@ -37,7 +38,7 @@ public class UpdateService {
         if(requestDto.isLoadNew()){
             return loadNewOnly(requestDto, user);
         } else {
-            return loadMessagePack(requestDto, user);
+            return loadMessageBatch(requestDto, user);
         }
     }
 
@@ -50,32 +51,23 @@ public class UpdateService {
             messageDtos = messageMapper.mapToDtoList(optionalConversation.get()
                     .getOnlyNewMessages(user));
         }
-        return new UpdateDto(conversationStatusDtos, messageDtos);
+        return new UpdateDto(conversationStatusDtos, messageDtos, null);
     }
 
-    private UpdateDto loadMessagePack(RequestDto requestDto, User user){
+    private UpdateDto loadMessageBatch(RequestDto requestDto, User user){
 
         List<ConversationStatusDto> conversationStatusDtos = new ArrayList<>();
-        List<MessageDto> messageDtos = new ArrayList<>();
+        MessageBatch messageBatch;
 
         Optional<Conversation> optionalConversation = getConversation(requestDto.getOpenedConversation());
         if(optionalConversation.isPresent()){
-            messageDtos = loadRequestedMessages(optionalConversation.get(), requestDto);
+            Optional<MessageBatch> optionalMessageBatch =
+                    optionalConversation.get().getMessageBatch(user, requestDto.getMessageBatchIndex());
+            if(optionalMessageBatch.isPresent()){
+                return new UpdateDto(conversationStatusDtos, new ArrayList<>(), optionalMessageBatch.get());
+            }
         }
-        return new UpdateDto(conversationStatusDtos, messageDtos);
-    }
-
-    private List<MessageDto> loadRequestedMessages(Conversation conversation, RequestDto requestDto){
-        int messageCount = getMessageCount(requestDto.getMessageBatchIndex());
-        return getLastMessages(conversation, messageCount);
-    }
-
-    private List<MessageDto> getLastMessages(Conversation conversation, int indexFrom, int indexTo){
-        return messageMapper.mapToDtoList(conversation.getMessages(user, indexFrom, indexTo));
-    }
-
-    private int getMessageCount(int messagePackedCountToLoad){
-        return messagePackedCountToLoad * settingsService.messageCountInPacked;
+        return new UpdateDto(conversationStatusDtos, new ArrayList<>(), null);
     }
 
     private Optional<Conversation> getConversation(long conversationId){

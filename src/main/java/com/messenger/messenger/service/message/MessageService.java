@@ -2,8 +2,10 @@ package com.messenger.messenger.service.message;
 
 import com.messenger.messenger.model.dto.MessageDto;
 import com.messenger.messenger.model.dto.RequestDto;
+import com.messenger.messenger.model.dto.UpdateDto;
 import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.User;
+import com.messenger.messenger.service.conversation.ConversationService;
 import com.messenger.messenger.service.user.AuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -23,12 +25,12 @@ public class MessageService {
     private SenderService senderService;
 
     @Autowired
-    private ConversationAdderService conversationAdderService;
+    private ConversationService conversationService;
 
     @Autowired
     private AuthorizationService authorizationService;
 
-    public ResponseEntity<List<MessageDto>> update(RequestDto requestDto, HttpServletRequest request){
+    public ResponseEntity<UpdateDto> update(RequestDto requestDto, HttpServletRequest request){
         Optional<User> userOptional = authorizationService.findUser(request);
         if(userOptional.isPresent()) {
             return ResponseEntity.ok(updateService.update(requestDto, userOptional.get()));
@@ -49,7 +51,7 @@ public class MessageService {
     public ResponseEntity<String> addConversation(HttpServletRequest request, List<UserDto> userDtos){
         Optional<User> userOptional = authorizationService.findUser(request);
         if(userOptional.isPresent()) {
-            return ResponseEntity.ok(conversationAdderService.addConversation(userDtos, userOptional.get()));
+            return ResponseEntity.ok(conversationService.addConversation(userDtos, userOptional.get()));
         } else {
             return ResponseEntity.badRequest().build();
         }
