@@ -9,9 +9,7 @@ import javax.persistence.Id;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 public class User {
-    @Id
     private long id;
     private String name;
     private String password;
@@ -20,8 +18,7 @@ public class User {
     private List<Conversation> conversations = new ArrayList<>();
     private List<ConversationStatusDto> conversationStatuses = new ArrayList<>();
 
-    public User(long id,String name, String password, String identityKey) {
-        this.id = id;
+    public User(String name, String password, String identityKey) {
         this.name = name;
         this.password = password;
         this.identityKey = identityKey;
@@ -57,5 +54,9 @@ public class User {
 
     public UserDto getDto() {
         return new UserDto(this.id, this.name);
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 }

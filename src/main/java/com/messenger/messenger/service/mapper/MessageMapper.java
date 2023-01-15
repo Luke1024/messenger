@@ -15,6 +15,6 @@ public class MessageMapper {
     }
 
     private MessageDto mapToDto(Message message){
-        return new MessageDto(message.getConversation().getId(), message.getSend(), message.getContent());
+        return new MessageDto(message.getConversation().getId(), message.getMessageBatch().getId(), message.getSend(), message.getContent());
     }
 }

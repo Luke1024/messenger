@@ -4,7 +4,7 @@ import com.messenger.messenger.model.dto.MessageDto;
 import com.messenger.messenger.model.dto.RequestDto;
 import com.messenger.messenger.model.dto.UpdateDto;
 import com.messenger.messenger.model.dto.UserDto;
-import com.messenger.messenger.service.message.MessageService;
+import com.messenger.messenger.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

@@ -2,6 +2,7 @@ package com.messenger.messenger.controller;
 
 import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.dto.UserDto;
+import com.messenger.messenger.model.entity.User;
 import com.messenger.messenger.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -21,7 +23,12 @@ public class UserController {
 
     @GetMapping(value = "/ping")
     public ResponseEntity<Boolean> pingServer(HttpServletRequest request){
-        return userService.ping(request);
+        Optional<User> userOptional = userService.findUserByHttpRequest(request);
+        if(userOptional.isPresent()){
+            return ResponseEntity.ok(true);
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @PostMapping(value = "/register")
@@ -36,6 +43,11 @@ public class UserController {
 
     @PostMapping(value = "/findUser/{userName}")
     public ResponseEntity<List<UserDto>> findUser(HttpServletRequest request, @PathVariable String userName){
-        return userService.findUser(request, userName);
+        Optional<User> userOptional = userService.findUserByHttpRequest(request);
+        if (userOptional.isPresent()) {
+            return ResponseEntity.ok(userService.findUsers(userName));
+        } else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 }

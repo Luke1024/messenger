@@ -3,7 +3,7 @@ package com.messenger.messenger.service.conversation;
 import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.User;
 import com.messenger.messenger.model.entity.conversation.Conversation;
-import com.messenger.messenger.repository.ConversationRepository;
+import com.messenger.messenger.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,31 +15,24 @@ import java.util.stream.Collectors;
 @Service
 public class ConversationService {
 
+    @Autowired
+    private UserService userService;
+
     private List<Conversation> conversations = new ArrayList<>();
 
-    public String addConversation(List<UserDto> userDtoList, User user){
-        List<Conversation> userConversations = user.getConversations();
-        Optional<Conversation> theSameConversationOptional = findTheSameConversation(userDtoList);
-        if(theSameConversationOptional.isPresent()){
-            return "Conversation already exists";
-        } else {
-            conversationRepository.add(new Conversation(
-                    generateId(),
-                    getUsersFromDtos(userDtoList)
-            ));
-            return "Conversation created";
-        }
+    public boolean addConversation(List<UserDto> userDtoList, User user){
+        List<User> usersForConversationCreation = userService.findUsersByDto(userDtoList);
+        usersForConversationCreation.add(user);
+        conversations.add(new Conversation(generateId(), usersForConversationCreation));
+        return true;
     }
 
     private long generateId(){
-        Optional<Conversation> conversation = conversationRepository.getLastConversation();
-        if(conversation.isPresent()){
-
+        if(conversations.isEmpty()){
+            return 0;
+        } else {
+            return conversations.get(conversations.size()-1).getId() + 1;
         }
-    }
-
-    private List<User> getUsersFromDtos(List<UserDto> userDtos){
-
     }
 
     public Optional<Conversation> getConversation(long conversationId){
@@ -50,5 +43,12 @@ public class ConversationService {
         } else {
             return Optional.empty();
         }
+    }
+
+    public Optional<Conversation> findById(long id){
+        for(Conversation conversation : conversations){
+            if(conversation.getId() == id) return Optional.of(conversation);
+        }
+        return Optional.empty();
     }
 }

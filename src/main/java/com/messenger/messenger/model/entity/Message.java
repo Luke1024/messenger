@@ -3,15 +3,11 @@ package com.messenger.messenger.model.entity;
 
 import com.messenger.messenger.model.entity.conversation.Conversation;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
 public class Message {
-    @Id
     private long id;
     private String content;
     private LocalDateTime send;
