@@ -20,6 +20,7 @@ public class Conversation {
             new MessageDistributionService(this, managedUsers, messageBatches);
 
     public Conversation(long id, List<User> users) {
+        this.id = id;
         this.managedUsers = createManagedUsers(users);
     }
 
@@ -63,6 +64,10 @@ public class Conversation {
         }
     }
 
+    public List<ManagedUser> getManagedUsers(){
+        return managedUsers;
+    }
+
     private ConversationStatusDto processToConversationDto(ManagedUser managedUser){
         return new ConversationStatusDto(
                 id,
@@ -81,7 +86,7 @@ public class Conversation {
         return Optional.empty();
     }
 
-    class ManagedUser {
+    public class ManagedUser {
         private User user;
         private List<Message> waitingMessages = new ArrayList<>();
         private int notificationCount;

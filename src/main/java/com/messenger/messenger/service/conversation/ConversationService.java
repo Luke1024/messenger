@@ -23,8 +23,15 @@ public class ConversationService {
     public boolean addConversation(List<UserDto> userDtoList, User user){
         List<User> usersForConversationCreation = userService.findUsersByDto(userDtoList);
         usersForConversationCreation.add(user);
-        conversations.add(new Conversation(generateId(), usersForConversationCreation));
+        Conversation newConversation = new Conversation(generateId(), usersForConversationCreation);
+        propagateConversationToUsers(newConversation);
+        conversations.add(newConversation);
         return true;
+    }
+
+    private void propagateConversationToUsers(Conversation newConversation){
+        newConversation.getManagedUsers().stream()
+                .forEach(managedUser -> managedUser.getUser().getConversations().add(newConversation));
     }
 
     private long generateId(){
