@@ -49,13 +49,13 @@ public class UserService {
         return Optional.empty();
     }
 
-    public ResponseEntity<Boolean> register(UserDataDto userDataDto){
+    public boolean register(UserDataDto userDataDto){
         if(isRegistrationAllowed(userDataDto)){
-            registerNewUser(userDataDto);
-            return ResponseEntity.ok(true);
-        } else {
-            return ResponseEntity.badRequest().body(false);
-        }
+            User newUser = generateNewUserFromDataDto(userDataDto);
+            newUser.setId(generateId());
+            users.add(newUser);
+            return true;
+        } else return false;
     }
 
     private boolean isRegistrationAllowed(UserDataDto userDataDto){
@@ -65,11 +65,7 @@ public class UserService {
         } else return true;
     }
 
-    private void registerNewUser(UserDataDto userDataDto){
-        save(generateNewUser(userDataDto));
-    }
-
-    private User generateNewUser(UserDataDto userDataDto){
+    private User generateNewUserFromDataDto(UserDataDto userDataDto){
         return new User(userDataDto.getUserName(), userDataDto.getPassword(), generateIdentityKey());
     }
 
@@ -77,15 +73,15 @@ public class UserService {
         return tokenService.generate();
     }
 
-    public ResponseEntity<Boolean> loginUser(UserDataDto userDataDto, HttpServletRequest request, HttpServletResponse response){
+    public boolean loginUser(UserDataDto userDataDto, HttpServletRequest request, HttpServletResponse response){
         Optional<User> userOptional = findByName(userDataDto.getUserName());
         if(userOptional.isPresent()) {
             if (isPasswordValid(userOptional.get().getPassword(),userDataDto.getPassword())) {
                 addIdentityCookie(userOptional.get().getIdentityKey(),response);
-                return ResponseEntity.ok(true);
+                return true;
             }
         }
-        return ResponseEntity.badRequest().body(false);
+        return false;
     }
 
     private boolean isPasswordValid(String passwordReal, String passwordGiven){
@@ -143,11 +139,6 @@ public class UserService {
             if(user.getIdentityKey().equals(identityKey)) return Optional.of(user);
         }
         return Optional.empty();
-    }
-
-    public void save(User user){
-        user.setId(generateId());
-        users.add(user);
     }
 
     private long generateId(){

@@ -33,12 +33,16 @@ public class UserController {
 
     @PostMapping(value = "/register")
     public ResponseEntity<Boolean> registerUser(UserDataDto userDataDto){
-        return userService.register(userDataDto);
+        if(userService.register(userDataDto)){
+            return ResponseEntity.ok(true);
+        } else return ResponseEntity.ok(false);
     }
 
     @PostMapping(value = "/login")
     public ResponseEntity<Boolean> loginUser(@RequestBody UserDataDto userDataDto, HttpServletRequest request, HttpServletResponse response){
-        return userService.loginUser(userDataDto, request, response);
+        if(userService.loginUser(userDataDto, request, response)){
+            return ResponseEntity.ok(true);
+        } else return ResponseEntity.badRequest().build();
     }
 
     @PostMapping(value = "/findUser/{userName}")
