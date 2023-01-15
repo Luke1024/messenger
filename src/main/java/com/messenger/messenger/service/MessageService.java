@@ -47,7 +47,7 @@ public class MessageService {
     }
 
     private UpdateDto loadNewOnly(RequestDto requestDto, User user){
-        List<ConversationStatusDto> conversationStatusDtos = new ArrayList<>();
+        List<ConversationStatusDto> conversationStatusDtos = getStatusOfAllConversations(user);
         List<MessageDto> messageDtos = new ArrayList<>();
 
         Optional<Conversation> optionalConversation = conversationService.getConversation(requestDto.getOpenedConversation());
@@ -56,6 +56,18 @@ public class MessageService {
                     .getOnlyNewMessages(user));
         }
         return new UpdateDto(conversationStatusDtos, messageDtos, null);
+    }
+
+    private List<ConversationStatusDto> getStatusOfAllConversations(User user){
+        List<Conversation> conversations = user.getConversations();
+        List<ConversationStatusDto> conversationStatusDtos = new ArrayList<>();
+        for(Conversation conversation : conversations){
+            Optional<ConversationStatusDto> conversationStatusDto = conversation.getConversationStatus(user);
+            if(conversationStatusDto.isPresent()){
+                conversationStatusDtos.add(conversationStatusDto.get());
+            }
+        }
+        return conversationStatusDtos;
     }
 
     private UpdateDto loadMessageBatch(RequestDto requestDto, User user){
