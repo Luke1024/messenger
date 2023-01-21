@@ -1,10 +1,7 @@
 package com.messenger.messenger.service;
 
 import com.messenger.messenger.model.dto.*;
-import com.messenger.messenger.model.entity.Message;
-import com.messenger.messenger.model.entity.MessageBatch;
-import com.messenger.messenger.model.entity.User;
-import com.messenger.messenger.model.entity.conversation.Conversation;
+import com.messenger.messenger.model.entity.*;
 import com.messenger.messenger.service.conversation.ConversationService;
 import com.messenger.messenger.service.mapper.MessageMapper;
 import com.messenger.messenger.service.user.UserService;
@@ -16,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class MessageService {
@@ -59,15 +57,16 @@ public class MessageService {
     }
 
     private List<ConversationStatusDto> getStatusOfAllConversations(User user){
-        List<Conversation> conversations = user.getConversations();
-        List<ConversationStatusDto> conversationStatusDtos = new ArrayList<>();
-        for(Conversation conversation : conversations){
-            Optional<ConversationStatusDto> conversationStatusDto = conversation.getConversationStatus(user);
-            if(conversationStatusDto.isPresent()){
-                conversationStatusDtos.add(conversationStatusDto.get());
-            }
-        }
-        return conversationStatusDtos;
+        return user.getConversations()
+                .entrySet().stream()
+                .map(conversationEntry -> convertToConversationStatusDto(conversationEntry.getKey(), conversationEntry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    private ConversationStatusDto convertToConversationStatusDto(Conversation conversation, ConversationStatus conversationStatus){
+        return new ConversationStatusDto(conversation.getId(),
+                conversation.getUsersInConversation().stream().map(user -> user.getDto()).collect(Collectors.toList()),
+                conversationStatus.getNotificationCount());
     }
 
     private UpdateDto loadMessageBatch(RequestDto requestDto, User user){
@@ -98,7 +97,7 @@ public class MessageService {
     private boolean sendMessage(MessageDto messageDto, User user){
         Optional<Conversation> optionalConversation = conversationService.findById(messageDto.getConversationId());
         if(optionalConversation.isPresent()){
-            optionalConversation.get().addMessage(new Message(
+            optionalConversation.get().addWaitingMessage(new Message(
                     messageDto.getContent(),
                     messageDto.getSend(),
                     user,

@@ -1,6 +1,9 @@
 package com.messenger.messenger.model.dto;
 
+import com.messenger.messenger.model.entity.Message;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class RequestDto {
     private boolean loadNew;

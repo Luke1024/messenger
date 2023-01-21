@@ -1,8 +1,9 @@
 package com.messenger.messenger.service.conversation;
 
 import com.messenger.messenger.model.dto.UserDto;
+import com.messenger.messenger.model.entity.ConversationStatus;
 import com.messenger.messenger.model.entity.User;
-import com.messenger.messenger.model.entity.conversation.Conversation;
+import com.messenger.messenger.model.entity.Conversation;
 import com.messenger.messenger.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,8 +31,8 @@ public class ConversationService {
     }
 
     private void propagateConversationToUsers(Conversation newConversation){
-        newConversation.getManagedUsers().stream()
-                .forEach(managedUser -> managedUser.getUser().getConversations().add(newConversation));
+        newConversation.getUsersInConversation().stream()
+                .forEach(user -> user.getConversations().put(newConversation, new ConversationStatus()));
     }
 
     private long generateId(){

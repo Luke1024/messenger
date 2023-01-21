@@ -1,13 +1,11 @@
 package com.messenger.messenger.model.entity;
 
-import com.messenger.messenger.model.dto.ConversationStatusDto;
 import com.messenger.messenger.model.dto.UserDto;
-import com.messenger.messenger.model.entity.conversation.Conversation;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class User {
     private long id;
@@ -15,8 +13,8 @@ public class User {
     private String password;
     private String identityKey;
     private List<User> usersSaved = new ArrayList<>();
-    private List<Conversation> conversations = new ArrayList<>();
-    private List<ConversationStatusDto> conversationStatuses = new ArrayList<>();
+    private Map<Conversation, ConversationStatus> conversations = new HashMap<>();
+
 
     public User(String name, String password, String identityKey) {
         this.name = name;
@@ -44,12 +42,8 @@ public class User {
         return usersSaved;
     }
 
-    public List<Conversation> getConversations() {
+    public Map<Conversation, ConversationStatus> getConversations() {
         return conversations;
-    }
-
-    public List<ConversationStatusDto> getConversationStatuses() {
-        return conversationStatuses;
     }
 
     public UserDto getDto() {

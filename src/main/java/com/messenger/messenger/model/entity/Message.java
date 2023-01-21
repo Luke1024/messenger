@@ -1,8 +1,6 @@
 package com.messenger.messenger.model.entity;
 
 
-import com.messenger.messenger.model.entity.conversation.Conversation;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
