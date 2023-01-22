@@ -1,7 +1,6 @@
 package com.messenger.messenger.model.entity;
 
 import com.messenger.messenger.service.SettingsService;
-import com.messenger.messenger.service.conversation.ConversationService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +26,36 @@ public class Conversation {
         MessageBatch currentBatch = getCurrentBatch();
         addMessageToBatch(currentBatch,message);
         informUsers(message);
+    }
+
+    public List<Message> getOnlyNewMessages(User user){
+        ConversationStatus conversationStatus = user.getConversations().get(this);
+        if(conversationStatus != null){
+            List<Message> newMessages = new ArrayList<>();
+            newMessages.addAll(conversationStatus.getWaitingMessages());
+            clearConversationStatus(conversationStatus);
+            return new ArrayList<>();
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    public Optional<MessageBatch> getMessageBatch(User user, int batchIndex) {
+        ConversationStatus conversationStatus = user.getConversations().get(this);
+        if(conversationStatus != null) {
+            clearConversationStatus(conversationStatus);
+            if(batchIndex >= 0){
+                return Optional.of(messageBatches.get(batchIndex));
+            } else {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public List<User> getUsersInConversation() {
+        return usersInConversation;
     }
 
     private void addMessageToBatch(MessageBatch messageBatch , Message message){
@@ -79,36 +108,8 @@ public class Conversation {
         }
     }
 
-    public List<Message> getOnlyNewMessages(User user){
-        ConversationStatus conversationStatus = user.getConversations().get(this);
-        if(conversationStatus != null){
-            List<Message> newMessages = new ArrayList<>();
-            newMessages.addAll(conversationStatus.getWaitingMessages());
-            conversationStatus.getWaitingMessages().clear();
-            return new ArrayList<>();
-        } else {
-            return new ArrayList<>();
-        }
-    }
-
-    public Optional<MessageBatch> getMessageBatch(User user, int batchIndex) {
-        ConversationStatus conversationStatus = user.getConversations().get(this);
-        if(conversationStatus != null) {
-            return getMessages(batchIndex);
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    public Optional<MessageBatch> getMessages(int batchIndex){
-        if(batchIndex >= 0){
-            return Optional.of(messageBatches.get(batchIndex));
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    public List<User> getUsersInConversation() {
-        return usersInConversation;
+    private void clearConversationStatus(ConversationStatus conversationStatus){
+        conversationStatus.clearNotifications();
+        conversationStatus.getWaitingMessages().clear();
     }
 }
