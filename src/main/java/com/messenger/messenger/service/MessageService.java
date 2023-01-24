@@ -2,9 +2,7 @@ package com.messenger.messenger.service;
 
 import com.messenger.messenger.model.dto.*;
 import com.messenger.messenger.model.entity.*;
-import com.messenger.messenger.service.conversation.ConversationService;
 import com.messenger.messenger.service.mapper.MessageMapper;
-import com.messenger.messenger.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -37,23 +35,32 @@ public class MessageService {
     }
 
     public UpdateDto executeUpdating(RequestDto requestDto, User user){
-        if(requestDto.isLoadNew()){
-            return loadNewOnly(requestDto, user);
-        } else {
-            return loadMessageBatch(requestDto, user);
-        }
-    }
-
-    private UpdateDto loadNewOnly(RequestDto requestDto, User user){
         List<ConversationStatusDto> conversationStatusDtos = getStatusOfAllConversations(user);
         List<MessageDto> messageDtos = new ArrayList<>();
+        Optional<MessageBatch> messageBatch = Optional.empty();
 
-        Optional<Conversation> optionalConversation = conversationService.getConversation(requestDto.getOpenedConversation());
+        Optional<Conversation> optionalConversation = conversationService.findById(requestDto.getOpenedConversation());
         if(optionalConversation.isPresent()) {
-            messageDtos = messageMapper.mapToDtoList(optionalConversation.get()
-                    .getOnlyNewMessages(user));
+            if(requestDto.isLoadNew()) {
+                messageDtos = messageMapper.mapToDtoList(optionalConversation.get()
+                        .getOnlyNewMessages(user));
+            } else {
+                Optional<MessageBatch> optionalMessageBatch =
+                        optionalConversation.get().getMessageBatch(user, requestDto.getMessageBatchIndex());
+            }
         }
-        return new UpdateDto(conversationStatusDtos, messageDtos, null);
+        return new UpdateDto(conversationStatusDtos, messageDtos, messageMapper.mapToBatchDtoFromMessageBatchOptional(messageBatch));
+    }
+
+    private UpdateDto loadMessageBatch(RequestDto requestDto, User user){
+
+        List<ConversationStatusDto> conversationStatusDtos = new ArrayList<>();
+
+        Optional<Conversation> optionalConversation = conversationService.findById(requestDto.getOpenedConversation());
+        if(optionalConversation.isPresent()){
+
+        }
+        return new UpdateDto(conversationStatusDtos, new ArrayList<>(), null);
     }
 
     private List<ConversationStatusDto> getStatusOfAllConversations(User user){
@@ -67,22 +74,6 @@ public class MessageService {
         return new ConversationStatusDto(conversation.getId(),
                 conversation.getUsersInConversation().stream().map(user -> user.getDto()).collect(Collectors.toList()),
                 conversationStatus.getNotificationCount());
-    }
-
-    private UpdateDto loadMessageBatch(RequestDto requestDto, User user){
-
-        List<ConversationStatusDto> conversationStatusDtos = new ArrayList<>();
-        MessageBatch messageBatch;
-
-        Optional<Conversation> optionalConversation = conversationService.getConversation(requestDto.getOpenedConversation());
-        if(optionalConversation.isPresent()){
-            Optional<MessageBatch> optionalMessageBatch =
-                    optionalConversation.get().getMessageBatch(user, requestDto.getMessageBatchIndex());
-            if(optionalMessageBatch.isPresent()){
-                return new UpdateDto(conversationStatusDtos, new ArrayList<>(), optionalMessageBatch.get());
-            }
-        }
-        return new UpdateDto(conversationStatusDtos, new ArrayList<>(), null);
     }
 
     public ResponseEntity<Boolean> send(MessageDto messageDto, HttpServletRequest request){
@@ -106,7 +97,6 @@ public class MessageService {
             return true;
         } else return false;
     }
-
 
     public ResponseEntity<Boolean> addConversation(HttpServletRequest request, List<UserDto> userDtos){
         Optional<User> userOptional = userService.findUserByHttpRequest(request);

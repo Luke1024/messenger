@@ -1,21 +1,19 @@
 package com.messenger.messenger.model.dto;
 
-import com.messenger.messenger.model.entity.MessageBatch;
-
 import java.util.List;
 
 public class UpdateDto {
     private List<ConversationStatusDto> conversationStatusDtos;
     private List<MessageDto> messageDtos;
-    private MessageBatch messageBatch;
+    private BatchDto batchDto;
 
     public UpdateDto() {
     }
 
-    public UpdateDto(List<ConversationStatusDto> conversationStatusDtos, List<MessageDto> messageDtos, MessageBatch messageBatch) {
+    public UpdateDto(List<ConversationStatusDto> conversationStatusDtos, List<MessageDto> messageDtos, BatchDto batchDto) {
         this.conversationStatusDtos = conversationStatusDtos;
         this.messageDtos = messageDtos;
-        this.messageBatch = messageBatch;
+        this.batchDto = batchDto;
     }
 
     public List<ConversationStatusDto> getConversationStatusDtos() {
@@ -26,7 +24,7 @@ public class UpdateDto {
         return messageDtos;
     }
 
-    public MessageBatch getMessageBatch() {
-        return messageBatch;
+    public BatchDto getBatchDto() {
+        return batchDto;
     }
 }

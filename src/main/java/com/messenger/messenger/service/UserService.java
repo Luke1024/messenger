@@ -1,12 +1,9 @@
-package com.messenger.messenger.service.user;
+package com.messenger.messenger.service;
 
 import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.User;
-import com.messenger.messenger.service.SettingsService;
-import com.messenger.messenger.service.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
