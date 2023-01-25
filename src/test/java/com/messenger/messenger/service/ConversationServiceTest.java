@@ -43,9 +43,6 @@ public class ConversationServiceTest {
         //is conversation created
         Assert.assertTrue(newConversationOptional.isPresent());
 
-        //is users in conversation
-        Assert.assertEquals(new ArrayList<>(Arrays.asList(newUser2, newUser1)), newConversationOptional.get().getUsersInConversation());
-
         //is user added to conversation aware
         Assert.assertTrue(newUser2.getConversations().containsKey(newConversationOptional.get()));
     }

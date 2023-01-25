@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -34,7 +35,7 @@ public class MessageService {
         }
     }
 
-    public UpdateDto executeUpdating(RequestDto requestDto, User user){
+    private UpdateDto executeUpdating(RequestDto requestDto, User user){
         List<ConversationStatusDto> conversationStatusDtos = getStatusOfAllConversations(user);
         List<MessageDto> messageDtos = new ArrayList<>();
         Optional<MessageBatch> messageBatch = Optional.empty();
@@ -76,21 +77,21 @@ public class MessageService {
                 conversationStatus.getNotificationCount());
     }
 
-    public ResponseEntity<Boolean> send(MessageDto messageDto, HttpServletRequest request){
+    public ResponseEntity<Boolean> send(SendMessageDto sendMessageDto, HttpServletRequest request){
         Optional<User> userOptional = userService.findUserByHttpRequest(request);
         if(userOptional.isPresent()) {
-            return ResponseEntity.ok(sendMessage(messageDto, userOptional.get()));
+            return ResponseEntity.ok(sendMessage(sendMessageDto, userOptional.get()));
         } else {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    private boolean sendMessage(MessageDto messageDto, User user){
-        Optional<Conversation> optionalConversation = conversationService.findById(messageDto.getConversationId());
+    private boolean sendMessage(SendMessageDto sendMessageDto, User user){
+        Optional<Conversation> optionalConversation = conversationService.findById(sendMessageDto.getConversationId());
         if(optionalConversation.isPresent()){
             optionalConversation.get().addWaitingMessage(new Message(
-                    messageDto.getContent(),
-                    messageDto.getSend(),
+                    sendMessageDto.getContent(),
+                    LocalDateTime.now(),
                     user,
                     optionalConversation.get())
             );

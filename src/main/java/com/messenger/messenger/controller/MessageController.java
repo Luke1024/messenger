@@ -1,9 +1,6 @@
 package com.messenger.messenger.controller;
 
-import com.messenger.messenger.model.dto.MessageDto;
-import com.messenger.messenger.model.dto.RequestDto;
-import com.messenger.messenger.model.dto.UpdateDto;
-import com.messenger.messenger.model.dto.UserDto;
+import com.messenger.messenger.model.dto.*;
 import com.messenger.messenger.service.MessageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,8 +23,8 @@ public class MessageController {
     }
 
     @PostMapping(value = "/send")
-    public ResponseEntity<Boolean> sendMessage(@RequestBody MessageDto messageDto, HttpServletRequest request){
-        return messageService.send(messageDto, request);
+    public ResponseEntity<Boolean> sendMessage(@RequestBody SendMessageDto sendMessageDto, HttpServletRequest request){
+        return messageService.send(sendMessageDto, request);
     }
 
     @PostMapping(value = "/addConversation")

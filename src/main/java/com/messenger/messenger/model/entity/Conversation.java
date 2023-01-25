@@ -73,12 +73,15 @@ public class Conversation {
     private MessageBatch getCurrentBatch(){
         if(messageBatches.isEmpty()){
             MessageBatch newMessageBatch = new MessageBatch(0, new ArrayList<>());
+            messageBatches.add(newMessageBatch);
             return newMessageBatch;
         }
         if( ! messageBatches.isEmpty()){
             MessageBatch lastMessageBatch = messageBatches.get(messageBatches.size()-1);
             if(lastMessageBatch.getMessages().size() > settingsService.messageCountInBatch-1){
-                return new MessageBatch(generateBatchId(), new ArrayList<>());
+                MessageBatch newMessageBatch = new MessageBatch(generateBatchId(), new ArrayList<>());
+                messageBatches.add(newMessageBatch);
+                return newMessageBatch;
             }
         }
         return messageBatches.get(messageBatches.size()-1);
