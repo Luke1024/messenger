@@ -1,6 +1,5 @@
 package com.messenger.messenger.service;
 
-import com.messenger.messenger.model.dto.RequestDto;
 import com.messenger.messenger.model.dto.SendMessageDto;
 import com.messenger.messenger.model.entity.Message;
 import com.messenger.messenger.model.entity.User;
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -51,19 +49,11 @@ public class MessageServiceTest {
         usersField.setAccessible(true);
         usersField.set(userService, new ArrayList<>(Arrays.asList(newUser1, newUser2, newUser3)));
 
-        //opening access to necessary methods excluding authorization
-        Method sendMessage = messageService.getClass().getDeclaredMethod("sendMessage", SendMessageDto.class, User.class);
-        sendMessage.setAccessible(true);
-
-        Method executeUpdating = messageService.getClass().getDeclaredMethod("executeUpdating", RequestDto.class, User.class);
-        executeUpdating.setAccessible(true);
-
-        Method update = messageService.getClass().getDeclaredMethod("load", RequestDto.class, HttpServletRequest.class);
-        update.setAccessible(true);
+        Method send = messageService.getClass().getDeclaredMethod("send", User.class, SendMessageDto.class);
 
         creatingConversation();
-        messageSendingAndBatchSplitting(sendMessage);
-        notificationTesting(sendMessage, update);
+        messageSendingAndBatchSplitting(send);
+        notificationTesting();
     }
 
     private void creatingConversation(){
@@ -76,10 +66,11 @@ public class MessageServiceTest {
         Assert.assertTrue(conversationService.findById(1).isPresent());
     }
 
-    private void messageSendingAndBatchSplitting(Method sendMessage) throws InvocationTargetException, IllegalAccessException {
+    private void messageSendingAndBatchSplitting(Method send) throws InvocationTargetException, IllegalAccessException {
         //newUser1 sending first message
-        sendMessage.invoke(messageService,
-                new SendMessageDto(0, "Hello fellow users."), newUser1);
+        send.invoke(messageService,
+                newUser1,
+                new SendMessageDto(0, "Hello fellow users."));
         //is new message batch created
         Assert.assertTrue(conversationService.findById(0).get().getMessageBatch(newUser2,0).isPresent());
         //is message there
@@ -88,15 +79,17 @@ public class MessageServiceTest {
         //add message count necessary to create second batch
 
         for(int i=0; i<settingsService.messageCountInBatch; i++){
-            sendMessage.invoke(messageService,
-                    new SendMessageDto(0, "I will add some content as newUser2."), newUser2);
+            send.invoke(messageService,
+                    newUser2,
+                    new SendMessageDto(0, "I will add some content as newUser2."));
         }
         //was second batch created?
         Assert.assertTrue(conversationService.findById(0).get().getMessageBatch(newUser3,1).isPresent());
 
         //add some unique message and check if it exist in second batch
-        sendMessage.invoke(messageService,
-                new SendMessageDto(0, "Unique message."), newUser3);
+        send.invoke(messageService,
+                newUser3,
+                new SendMessageDto(0, "Unique message."));
 
         //check if unique message exists
 
@@ -105,10 +98,9 @@ public class MessageServiceTest {
         Assert.assertEquals("Unique message.", messagesInLastBatch.get(messagesInLastBatch.size()-1).getContent());
     }
 
-    private void notificationTesting(Method sendMessage, Method update) throws InvocationTargetException, IllegalAccessException {
-        //update with every user to reset notifications
-        //update.invoke(messageService,
-          //      new RequestDto(true,),
-            //    newUser1);
+    private void notificationTesting()
+            throws InvocationTargetException, IllegalAccessException {
+            //update with every user to reset notifications
+            //getNewMessages.invoke(messageService,0,)
     }
 }

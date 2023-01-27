@@ -4,10 +4,8 @@ import com.messenger.messenger.model.dto.*;
 import com.messenger.messenger.model.entity.*;
 import com.messenger.messenger.service.mapper.MessageMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,53 +24,32 @@ public class MessageService {
     @Autowired
     private UserService userService;
 
-    public ResponseEntity<Boolean> isStatusChange(HttpServletRequest request){
-        Optional<User> userOptional = userService.findUserByHttpRequest(request);
-        if(userOptional.isPresent()){
-            return ResponseEntity.ok(userOptional.get().isConversationStatusChanged());
-        } else {
-            return ResponseEntity.ok(false);
-        }
+    public Boolean isStatusChanged(User userRequesting){
+        return userRequesting.isConversationStatusChanged();
     }
 
-    public ResponseEntity<List<ConversationStatusDto>> getConversationStatus(HttpServletRequest request){
-        Optional<User> userOptional = userService.findUserByHttpRequest(request);
-        if(userOptional.isPresent()){
-            return ResponseEntity.ok(getStatusOfAllConversations(userOptional.get()));
-        } else {
-            return ResponseEntity.ok(new ArrayList<>());
-        }
-    }
-
-    public ResponseEntity<List<MessageDto>> getNewMessages(long conversationId, HttpServletRequest request){
-        Optional<User> userOptional = userService.findUserByHttpRequest(request);
-        if(userOptional.isPresent()){
-            Optional<Conversation> optionalConversation = conversationService.findById(conversationId);
-            if(optionalConversation.isPresent()){
-                return ResponseEntity.ok(messageMapper.mapToDtoList(optionalConversation.get().getOnlyNewMessages(userOptional.get())));
-            }
-        }
-        return ResponseEntity.badRequest().build();
-    }
-
-    public ResponseEntity<BatchDto> load(long conversationId, long batchId, HttpServletRequest request){
-        Optional<User> userOptional = userService.findUserByHttpRequest(request);
-        if(userOptional.isPresent()) {
-            Optional<Conversation> optionalConversation = conversationService.findById(conversationId);
-            if (optionalConversation.isPresent()) {
-                Optional<BatchDto> optionalBatchDto =
-                        messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
-                                optionalConversation.get().getMessageBatch(userOptional.get(), (int) batchId));
-            }
-        }
-        return ResponseEntity.badRequest().build();
-    }
-
-    private List<ConversationStatusDto> getStatusOfAllConversations(User user){
-        return user.getConversations()
+    public List<ConversationStatusDto> getConversationStatus(User userRequesting){
+        return userRequesting.getConversations()
                 .entrySet().stream()
                 .map(conversationEntry -> convertToConversationStatusDto(conversationEntry.getKey(), conversationEntry.getValue()))
                 .collect(Collectors.toList());
+    }
+
+    public List<MessageDto> getNewMessages(User userRequesting, long conversationId){
+        Optional<Conversation> optionalConversation = conversationService.findById(conversationId);
+        if(optionalConversation.isPresent()){
+            return messageMapper.mapToDtoList(optionalConversation.get().getOnlyNewMessages(userRequesting));
+        }
+        return new ArrayList<>();
+    }
+
+    public Optional<BatchDto> load(User userRequesting, long conversationId, long batchId) {
+        Optional<Conversation> optionalConversation = conversationService.findById(conversationId);
+        if (optionalConversation.isPresent()) {
+            return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
+                    optionalConversation.get().getMessageBatch(userRequesting, (int) batchId));
+        }
+        return Optional.empty();
     }
 
     private ConversationStatusDto convertToConversationStatusDto(Conversation conversation, ConversationStatus conversationStatus){
@@ -81,34 +58,20 @@ public class MessageService {
                 conversationStatus.getNotificationCount());
     }
 
-    public ResponseEntity<Boolean> send(SendMessageDto sendMessageDto, HttpServletRequest request){
-        Optional<User> userOptional = userService.findUserByHttpRequest(request);
-        if(userOptional.isPresent()) {
-            return ResponseEntity.ok(sendMessage(sendMessageDto, userOptional.get()));
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
-    private boolean sendMessage(SendMessageDto sendMessageDto, User user){
+    public boolean send(User userRequesting, SendMessageDto sendMessageDto){
         Optional<Conversation> optionalConversation = conversationService.findById(sendMessageDto.getConversationId());
         if(optionalConversation.isPresent()){
             optionalConversation.get().addWaitingMessage(new Message(
                     sendMessageDto.getContent(),
                     LocalDateTime.now(),
-                    user,
+                    userRequesting,
                     optionalConversation.get())
             );
             return true;
         } else return false;
     }
 
-    public ResponseEntity<Boolean> addConversation(HttpServletRequest request, List<UserDto> userDtos){
-        Optional<User> userOptional = userService.findUserByHttpRequest(request);
-        if(userOptional.isPresent()) {
-            return ResponseEntity.ok(conversationService.addConversation(userDtos, userOptional.get()));
-        } else {
-            return ResponseEntity.badRequest().build();
-        }
+    public boolean addConversation(User userRequesting, List<UserDto> userDtos){
+        return conversationService.addConversation(userDtos, userRequesting);
     }
 }
