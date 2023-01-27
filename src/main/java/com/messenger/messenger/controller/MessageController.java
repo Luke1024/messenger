@@ -17,9 +17,24 @@ public class MessageController {
     @Autowired
     private MessageService messageService;
 
-    @PostMapping(value = "/update")
-    public ResponseEntity<UpdateDto> getConversationUpdate(@RequestBody RequestDto requestDto, HttpServletRequest request){
-        return messageService.update(requestDto, request);
+    @GetMapping(value = "change")
+    public ResponseEntity<Boolean> isStatusNew(HttpServletRequest request){
+        return messageService.isStatusChange(request);
+    }
+
+    @PostMapping(value = "/status")
+    public ResponseEntity<List<ConversationStatusDto>> getConversationStatus(HttpServletRequest request){
+        return messageService.getConversationStatus(request);
+    }
+
+    @PostMapping(value = "/new/{conversationId}")
+    public ResponseEntity<List<MessageDto>> getMessages(long conversationId, HttpServletRequest request){
+        return messageService.getNewMessages(conversationId, request);
+    }
+
+    @PostMapping(value = "/load/{conversationId}/{batchId}")
+    public ResponseEntity<BatchDto> getConversationUpdate(long conversationId, long batchId, HttpServletRequest request){
+        return messageService.load(conversationId, batchId, request);
     }
 
     @PostMapping(value = "/send")

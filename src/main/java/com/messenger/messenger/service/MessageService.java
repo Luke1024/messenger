@@ -26,42 +26,46 @@ public class MessageService {
     @Autowired
     private UserService userService;
 
-    public ResponseEntity<UpdateDto> update(RequestDto requestDto, HttpServletRequest request){
+    public ResponseEntity<Boolean> isStatusChange(HttpServletRequest request){
         Optional<User> userOptional = userService.findUserByHttpRequest(request);
-        if(userOptional.isPresent()) {
-            return ResponseEntity.ok(executeUpdating(requestDto, userOptional.get()));
+        if(userOptional.isPresent()){
+            return ResponseEntity.ok(userOptional.get().isConversationStatusChanged());
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(false);
         }
     }
 
-    private UpdateDto executeUpdating(RequestDto requestDto, User user){
-        List<ConversationStatusDto> conversationStatusDtos = getStatusOfAllConversations(user);
-        List<MessageDto> messageDtos = new ArrayList<>();
-        Optional<MessageBatch> messageBatch = Optional.empty();
+    public ResponseEntity<List<ConversationStatusDto>> getConversationStatus(HttpServletRequest request){
+        Optional<User> userOptional = userService.findUserByHttpRequest(request);
+        if(userOptional.isPresent()){
+            return ResponseEntity.ok(getStatusOfAllConversations(userOptional.get()));
+        } else {
+            return ResponseEntity.ok(new ArrayList<>());
+        }
+    }
 
-        Optional<Conversation> optionalConversation = conversationService.findById(requestDto.getOpenedConversation());
-        if(optionalConversation.isPresent()) {
-            if(requestDto.isLoadNew()) {
-                messageDtos = messageMapper.mapToDtoList(optionalConversation.get()
-                        .getOnlyNewMessages(user));
-            } else {
-                Optional<MessageBatch> optionalMessageBatch =
-                        optionalConversation.get().getMessageBatch(user, requestDto.getMessageBatchIndex());
+    public ResponseEntity<List<MessageDto>> getNewMessages(long conversationId, HttpServletRequest request){
+        Optional<User> userOptional = userService.findUserByHttpRequest(request);
+        if(userOptional.isPresent()){
+            Optional<Conversation> optionalConversation = conversationService.findById(conversationId);
+            if(optionalConversation.isPresent()){
+                return ResponseEntity.ok(messageMapper.mapToDtoList(optionalConversation.get().getOnlyNewMessages(userOptional.get())));
             }
         }
-        return new UpdateDto(conversationStatusDtos, messageDtos, messageMapper.mapToBatchDtoFromMessageBatchOptional(messageBatch));
+        return ResponseEntity.badRequest().build();
     }
 
-    private UpdateDto loadMessageBatch(RequestDto requestDto, User user){
-
-        List<ConversationStatusDto> conversationStatusDtos = new ArrayList<>();
-
-        Optional<Conversation> optionalConversation = conversationService.findById(requestDto.getOpenedConversation());
-        if(optionalConversation.isPresent()){
-
+    public ResponseEntity<BatchDto> load(long conversationId, long batchId, HttpServletRequest request){
+        Optional<User> userOptional = userService.findUserByHttpRequest(request);
+        if(userOptional.isPresent()) {
+            Optional<Conversation> optionalConversation = conversationService.findById(conversationId);
+            if (optionalConversation.isPresent()) {
+                Optional<BatchDto> optionalBatchDto =
+                        messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
+                                optionalConversation.get().getMessageBatch(userOptional.get(), (int) batchId));
+            }
         }
-        return new UpdateDto(conversationStatusDtos, new ArrayList<>(), null);
+        return ResponseEntity.badRequest().build();
     }
 
     private List<ConversationStatusDto> getStatusOfAllConversations(User user){

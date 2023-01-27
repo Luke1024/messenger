@@ -53,4 +53,11 @@ public class User {
     public void setId(long id) {
         this.id = id;
     }
+
+    public boolean isConversationStatusChanged(){
+        for(ConversationStatus conversationStatus : conversations.values()){
+            if(conversationStatus.isThereSomethingNew()) return true;
+        }
+        return false;
+    }
 }

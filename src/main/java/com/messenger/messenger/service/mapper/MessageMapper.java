@@ -21,11 +21,11 @@ public class MessageMapper {
         return new MessageDto(message.getConversation().getId(), message.getMessageBatch().getId(), message.getSend(), message.getContent());
     }
 
-    public BatchDto mapToBatchDtoFromMessageBatchOptional(Optional<MessageBatch> messageBatch){
+    public Optional<BatchDto> mapToBatchDtoOptionalFromMessageBatchOptional(Optional<MessageBatch> messageBatch){
         if(messageBatch.isPresent()){
-            return new BatchDto(messageBatch.get().getId(), mapToDtoList(messageBatch.get().getMessages()));
+            return Optional.of(new BatchDto(messageBatch.get().getId(), mapToDtoList(messageBatch.get().getMessages())));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 }
