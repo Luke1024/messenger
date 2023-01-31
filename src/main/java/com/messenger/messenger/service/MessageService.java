@@ -43,7 +43,17 @@ public class MessageService {
         return new ArrayList<>();
     }
 
-    public Optional<BatchDto> load(User userRequesting, long conversationId, long batchId) {
+    public Optional<BatchDto> loadLastBatch(User user, long conversationId) {
+        Optional<Conversation> optionalConversation = conversationService.findById(conversationId);
+        if(optionalConversation.isPresent()){
+            return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional
+                    (optionalConversation.get().getLastMessageBatch(user));
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public Optional<BatchDto> loadBatch(User userRequesting, long conversationId, long batchId) {
         Optional<Conversation> optionalConversation = conversationService.findById(conversationId);
         if (optionalConversation.isPresent()) {
             return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(

@@ -1,6 +1,7 @@
 package com.messenger.messenger.service;
 
 import com.messenger.messenger.model.dto.SendMessageDto;
+import com.messenger.messenger.model.entity.Conversation;
 import com.messenger.messenger.model.entity.Message;
 import com.messenger.messenger.model.entity.User;
 import org.junit.Assert;
@@ -12,7 +13,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -49,10 +49,8 @@ public class MessageServiceTest {
         usersField.setAccessible(true);
         usersField.set(userService, new ArrayList<>(Arrays.asList(newUser1, newUser2, newUser3)));
 
-        Method send = messageService.getClass().getDeclaredMethod("send", User.class, SendMessageDto.class);
-
         creatingConversation();
-        messageSendingAndBatchSplitting(send);
+        messageSendingAndBatchSplitting();
         notificationTesting();
     }
 
@@ -66,9 +64,9 @@ public class MessageServiceTest {
         Assert.assertTrue(conversationService.findById(1).isPresent());
     }
 
-    private void messageSendingAndBatchSplitting(Method send) throws InvocationTargetException, IllegalAccessException {
+    private void messageSendingAndBatchSplitting() throws InvocationTargetException, IllegalAccessException {
         //newUser1 sending first message
-        send.invoke(messageService,
+        messageService.send(
                 newUser1,
                 new SendMessageDto(0, "Hello fellow users."));
         //is new message batch created
@@ -79,7 +77,7 @@ public class MessageServiceTest {
         //add message count necessary to create second batch
 
         for(int i=0; i<settingsService.messageCountInBatch; i++){
-            send.invoke(messageService,
+            messageService.send(
                     newUser2,
                     new SendMessageDto(0, "I will add some content as newUser2."));
         }
@@ -87,7 +85,7 @@ public class MessageServiceTest {
         Assert.assertTrue(conversationService.findById(0).get().getMessageBatch(newUser3,1).isPresent());
 
         //add some unique message and check if it exist in second batch
-        send.invoke(messageService,
+        messageService.send(
                 newUser3,
                 new SendMessageDto(0, "Unique message."));
 
@@ -100,7 +98,21 @@ public class MessageServiceTest {
 
     private void notificationTesting()
             throws InvocationTargetException, IllegalAccessException {
-            //update with every user to reset notifications
-            //getNewMessages.invoke(messageService,0,)
+
+            List<User> users = new ArrayList<>(Arrays.asList(newUser1, newUser2, newUser3));
+
+            List<Conversation> createdConversations = new ArrayList<>(Arrays.asList(
+                    conversationService.findById(0).get(),
+                    conversationService.findById(1).get()
+            ));
+
+            //in all conversation for all users statuses should be new
+
+            for(User user : users){
+                for(Conversation conversation : createdConversations){
+                   // messageService.
+                }
+            }
+
     }
 }

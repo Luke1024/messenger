@@ -53,11 +53,23 @@ public class MessageController {
         }
     }
 
+    @PostMapping(value = "loadLast/{conversationId}")
+    public ResponseEntity<BatchDto> getLastMessageBatch(long conversationId, HttpServletRequest request){
+        Optional<User> userOptional = authorize(request);
+        if(userOptional.isPresent()){
+            Optional<BatchDto> optionalBatchDto = messageService.loadLastBatch(userOptional.get(), conversationId);
+            if(optionalBatchDto.isPresent()){
+                return ResponseEntity.ok(optionalBatchDto.get());
+            }
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
     @PostMapping(value = "/load/{conversationId}/{batchId}")
-    public ResponseEntity<BatchDto> getConversationUpdate(long conversationId, long batchId, HttpServletRequest request){
+    public ResponseEntity<BatchDto> getMessageBatch(long conversationId, long batchId, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()) {
-            Optional<BatchDto> optionalBatchDto = messageService.load(userOptional.get(), conversationId, batchId);
+            Optional<BatchDto> optionalBatchDto = messageService.loadBatch(userOptional.get(), conversationId, batchId);
             if (optionalBatchDto.isPresent()) {
                 return ResponseEntity.ok(optionalBatchDto.get());
             }

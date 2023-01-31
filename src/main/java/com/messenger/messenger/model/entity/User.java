@@ -15,7 +15,6 @@ public class User {
     private List<User> usersSaved = new ArrayList<>();
     private Map<Conversation, ConversationStatus> conversations = new HashMap<>();
 
-
     public User(String name, String password, String identityKey) {
         this.name = name;
         this.password = password;

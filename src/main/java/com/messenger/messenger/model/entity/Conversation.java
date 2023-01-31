@@ -40,18 +40,30 @@ public class Conversation {
         }
     }
 
+    public Optional<MessageBatch> getLastMessageBatch(User user){
+        ConversationStatus conversationStatus = user.getConversations().get(this);
+        if(conversationStatus != null){
+            clearConversationStatus(conversationStatus);
+            if( ! messageBatches.isEmpty()){
+                return Optional.of(messageBatches.get(messageBatches.size()-1));
+            }
+        }
+        return Optional.empty();
+    }
+
     public Optional<MessageBatch> getMessageBatch(User user, int batchIndex) {
         ConversationStatus conversationStatus = user.getConversations().get(this);
         if(conversationStatus != null) {
             clearConversationStatus(conversationStatus);
-            if(batchIndex >= 0){
+            if (isBatchIndexInRange(batchIndex)) {
                 return Optional.of(messageBatches.get(batchIndex));
-            } else {
-                return Optional.empty();
             }
-        } else {
-            return Optional.empty();
         }
+        return Optional.empty();
+    }
+
+    private boolean isBatchIndexInRange(int batchIndex){
+        return batchIndex >= 0 && messageBatches.size() > batchIndex;
     }
 
     public List<User> getUsersInConversation() {
