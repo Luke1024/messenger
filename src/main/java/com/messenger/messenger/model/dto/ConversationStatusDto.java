@@ -26,4 +26,13 @@ public class ConversationStatusDto {
     public int getWaitingMessages() {
         return waitingMessages;
     }
+
+    @Override
+    public String toString() {
+        return "ConversationStatusDto{" +
+                "conversationId=" + conversationId +
+                ", users=" + users +
+                ", waitingMessages=" + waitingMessages +
+                '}';
+    }
 }

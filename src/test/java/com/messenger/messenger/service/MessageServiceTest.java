@@ -1,5 +1,6 @@
 package com.messenger.messenger.service;
 
+import com.messenger.messenger.model.dto.ConversationStatusDto;
 import com.messenger.messenger.model.dto.SendMessageDto;
 import com.messenger.messenger.model.entity.Conversation;
 import com.messenger.messenger.model.entity.Message;
@@ -16,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -56,8 +58,8 @@ public class MessageServiceTest {
 
     private void creatingConversation(){
         //creating conversations
-        conversationService.addConversation(Arrays.asList(newUser2.getDto(), newUser3.getDto()),newUser1);
-        conversationService.addConversation(Arrays.asList(newUser1.getDto(), newUser3.getDto()), newUser2);
+        messageService.addConversation(newUser1 ,Arrays.asList(newUser2.getDto(), newUser3.getDto()));
+        messageService.addConversation(newUser2, Arrays.asList(newUser1.getDto(), newUser3.getDto()));
 
         //check created conversations
         Assert.assertTrue(conversationService.findById(0).isPresent());
@@ -82,7 +84,7 @@ public class MessageServiceTest {
                     new SendMessageDto(0, "I will add some content as newUser2."));
         }
         //was second batch created?
-        Assert.assertTrue(conversationService.findById(0).get().getMessageBatch(newUser3,1).isPresent());
+        Assert.assertEquals(1, messageService.loadLastBatch(newUser1, 0).get().getId());
 
         //add some unique message and check if it exist in second batch
         messageService.send(
@@ -106,13 +108,42 @@ public class MessageServiceTest {
                     conversationService.findById(1).get()
             ));
 
-            //in all conversation for all users statuses should be new
-
+            //all user requesting last batch in every conversation to reset conversation statuses
             for(User user : users){
                 for(Conversation conversation : createdConversations){
-                   // messageService.
+                   messageService.loadLastBatch(user, conversation.getId());
                 }
             }
 
+            //waiting message count in conversation status should be 0
+            for(User user : users){
+                for(ConversationStatusDto conversationStatusDto : messageService.getConversationStatus(user)){
+                    Assert.assertTrue(conversationStatusDto.getWaitingMessages() == 0 );
+                }
+            }
+
+            //status for user change should be false
+            for(User user : users){
+                Assert.assertFalse(messageService.isStatusChanged(user));
+            }
+
+            //new user1 writing something in conversation id 0
+            messageService.send(newUser1, new SendMessageDto(0, "Hello again fellow users. I'm, still here."));
+
+            Assert.assertTrue(messageService.isStatusChanged(newUser1));
+            Assert.assertTrue(messageService.isStatusChanged(newUser2));
+            Assert.assertTrue(messageService.isStatusChanged(newUser3));
+
+            //emulate newUser2 client
+            Assert.assertTrue(messageService.isStatusChanged(newUser2));
+
+            List<ConversationStatusDto> conversationStatusDtos =
+                    messageService.getConversationStatus(newUser2).stream().filter(
+                            conversationStatusDto -> conversationStatusDto.getConversationId()==0).collect(Collectors.toList());
+
+
+            Assert.assertEquals( 1 , conversationStatusDtos.get(0).getWaitingMessages());
+            Assert.assertEquals("Hello again fellow users. I'm, still here.",
+                    messageService.getNewMessages(newUser2,0).get(0).getContent());
     }
 }

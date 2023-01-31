@@ -7,9 +7,8 @@ public class MessageBatch {
     private long id;
     private List<Message> messages = new ArrayList<>();
 
-    public MessageBatch(long id, List<Message> messages) {
+    public MessageBatch(long id) {
         this.id = id;
-        this.messages = messages;
     }
 
     public long getId() {

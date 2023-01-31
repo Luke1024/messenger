@@ -34,7 +34,7 @@ public class Conversation {
             List<Message> newMessages = new ArrayList<>();
             newMessages.addAll(conversationStatus.getWaitingMessages());
             clearConversationStatus(conversationStatus);
-            return new ArrayList<>();
+            return newMessages;
         } else {
             return new ArrayList<>();
         }
@@ -70,9 +70,10 @@ public class Conversation {
         return usersInConversation;
     }
 
-    private void addMessageToBatch(MessageBatch messageBatch , Message message){
+    private void addMessageToBatch(MessageBatch messageBatch, Message message){
         if(messageBatch.getMessages().isEmpty()){
             message.setId(0);
+            message.setMessageBatch(messageBatch);
         } else {
             List<Message> messages = messageBatch.getMessages();
             long newId = messages.get(messages.size()-1).getId() + 1;
@@ -84,14 +85,14 @@ public class Conversation {
 
     private MessageBatch getCurrentBatch(){
         if(messageBatches.isEmpty()){
-            MessageBatch newMessageBatch = new MessageBatch(0, new ArrayList<>());
+            MessageBatch newMessageBatch = new MessageBatch(0);
             messageBatches.add(newMessageBatch);
             return newMessageBatch;
         }
         if( ! messageBatches.isEmpty()){
             MessageBatch lastMessageBatch = messageBatches.get(messageBatches.size()-1);
             if(lastMessageBatch.getMessages().size() > settingsService.messageCountInBatch-1){
-                MessageBatch newMessageBatch = new MessageBatch(generateBatchId(), new ArrayList<>());
+                MessageBatch newMessageBatch = new MessageBatch(generateBatchId());
                 messageBatches.add(newMessageBatch);
                 return newMessageBatch;
             }
@@ -124,7 +125,6 @@ public class Conversation {
     }
 
     private void clearConversationStatus(ConversationStatus conversationStatus){
-        conversationStatus.clearNotifications();
-        conversationStatus.getWaitingMessages().clear();
+        conversationStatus.clearStatus();
     }
 }

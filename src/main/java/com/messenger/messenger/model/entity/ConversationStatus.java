@@ -24,9 +24,10 @@ public class ConversationStatus {
         notificationCount++;
     }
 
-    public void clearNotifications(){
+    public void clearStatus(){
         notificationCount=0;
         somethingChanged=false;
+        waitingMessages.clear();
     }
 
     public boolean isThereSomethingNew(){
