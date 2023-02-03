@@ -39,8 +39,8 @@ public class UserController {
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<Boolean> loginUser(@RequestBody UserDataDto userDataDto, HttpServletRequest request, HttpServletResponse response){
-        if(userService.loginUser(userDataDto, request, response)){
+    public ResponseEntity<Boolean> loginUser(@RequestBody UserDataDto userDataDto, HttpServletResponse response){
+        if(userService.loginUser(userDataDto, response)){
             return ResponseEntity.ok(true);
         } else return ResponseEntity.badRequest().build();
     }
