@@ -4,6 +4,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SettingsService {
-    public String authKey = "authKey";
+    public String authKey = "AUTH";
     public int messageCountInBatch = 50;
 }

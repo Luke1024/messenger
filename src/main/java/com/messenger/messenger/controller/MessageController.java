@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,31 +30,31 @@ public class MessageController {
         if(userOptional.isPresent()) {
             return ResponseEntity.ok(messageService.isStatusChanged(userOptional.get()));
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(false);
         }
     }
 
-    @PostMapping(value = "/status")
+    @GetMapping(value = "/status")
     public ResponseEntity<List<ConversationStatusDto>> getConversationStatus(HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()) {
             return ResponseEntity.ok(messageService.getConversationStatus(userOptional.get()));
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(new ArrayList<>());
         }
     }
 
-    @PostMapping(value = "/new/{conversationId}")
+    @GetMapping(value = "/new/{conversationId}")
     public ResponseEntity<List<MessageDto>> getNewMessages(long conversationId, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
             return ResponseEntity.ok(messageService.getNewMessages(userOptional.get(), conversationId));
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(new ArrayList<>());
         }
     }
 
-    @PostMapping(value = "loadLast/{conversationId}")
+    @GetMapping(value = "loadLast/{conversationId}")
     public ResponseEntity<BatchDto> getLastMessageBatch(long conversationId, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
@@ -62,7 +63,7 @@ public class MessageController {
                 return ResponseEntity.ok(optionalBatchDto.get());
             }
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(new BatchDto());
     }
 
     @PostMapping(value = "/load/{conversationId}/{batchId}")
@@ -74,7 +75,7 @@ public class MessageController {
                 return ResponseEntity.ok(optionalBatchDto.get());
             }
         }
-        return ResponseEntity.badRequest().build();
+        return ResponseEntity.ok(new BatchDto());
     }
 
     @PostMapping(value = "/send")
@@ -83,7 +84,7 @@ public class MessageController {
         if(userOptional.isPresent()){
             return ResponseEntity.ok(messageService.send(userOptional.get(), sendMessageDto));
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(false);
         }
     }
 
@@ -93,7 +94,7 @@ public class MessageController {
         if(userOptional.isPresent()){
             return ResponseEntity.ok(messageService.addConversation(userOptional.get(), userDtos));
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(false);
         }
     }
 

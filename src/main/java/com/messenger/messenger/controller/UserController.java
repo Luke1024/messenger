@@ -10,10 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200/",allowCredentials = "true")
 @RestController
 @RequestMapping(value = "/user")
 public class UserController {
@@ -27,12 +28,12 @@ public class UserController {
         if(userOptional.isPresent()){
             return ResponseEntity.ok(true);
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(false);
         }
     }
 
     @PostMapping(value = "/register")
-    public ResponseEntity<Boolean> registerUser(UserDataDto userDataDto){
+    public ResponseEntity<Boolean> registerUser(@RequestBody UserDataDto userDataDto){
         if(userService.register(userDataDto)){
             return ResponseEntity.ok(true);
         } else return ResponseEntity.ok(false);
@@ -42,7 +43,7 @@ public class UserController {
     public ResponseEntity<Boolean> loginUser(@RequestBody UserDataDto userDataDto, HttpServletResponse response){
         if(userService.loginUser(userDataDto, response)){
             return ResponseEntity.ok(true);
-        } else return ResponseEntity.badRequest().build();
+        } else return ResponseEntity.ok(false);
     }
 
     @PostMapping(value = "/findUser/{userName}")
@@ -51,7 +52,7 @@ public class UserController {
         if (userOptional.isPresent()) {
             return ResponseEntity.ok(userService.findUsers(userName));
         } else {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok(new ArrayList<>());
         }
     }
 }

@@ -3,6 +3,8 @@ package com.messenger.messenger.service;
 import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +12,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -23,11 +26,14 @@ public class UserService {
     @Autowired
     private SettingsService settingsService;
 
+    private Logger logger = LoggerFactory.getLogger(UserService.class);
+
     private List<User> users = new ArrayList<>();
 
     public Optional<User> findUserByHttpRequest(HttpServletRequest request){
         Optional<String> optionalIdentityKey = getIdentityKey(request);
         if(optionalIdentityKey.isPresent()) {
+            logger.info("User is pinging with authKey: " + optionalIdentityKey.get());
             return findByIdentityKey(optionalIdentityKey.get());
         } else {
             return Optional.empty();
@@ -36,6 +42,8 @@ public class UserService {
 
     public boolean register(UserDataDto userDataDto){
         if(isRegistrationAllowed(userDataDto)){
+            logger.info("Registering user with name: " + userDataDto.getUserName()
+                    + " and password: " + userDataDto.getPassword());
             User newUser = generateNewUserFromDataDto(userDataDto);
             newUser.setId(generateId());
             users.add(newUser);
@@ -124,7 +132,7 @@ public class UserService {
     }
 
     private String cookieGenerator(String identityKey){
-        return settingsService.authKey + "=" + identityKey + "; Max-Age=15000000; Secure; HttpOnly; SameSite=None";
+        return settingsService.authKey + "=" + identityKey + "; SameSite=Strict; Path=/; Max-Age=15000000; HttpOnly;";
     }
 
     private Optional<User> findById(long userId){
