@@ -45,5 +45,8 @@ public class ConversationServiceTest {
 
         //is user added to conversation aware
         Assert.assertTrue(newUser2.getConversations().containsKey(newConversationOptional.get()));
+
+        //what if the same conversation is created once more
+        Assert.assertFalse(conversationService.addConversation(new ArrayList<>(Arrays.asList(newUser2)), newUser1));
     }
 }

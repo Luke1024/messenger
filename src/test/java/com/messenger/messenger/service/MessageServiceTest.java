@@ -59,11 +59,12 @@ public class MessageServiceTest {
     private void creatingConversation(){
         //creating conversations
         messageService.addConversation(newUser1 ,Arrays.asList(newUser2.getDto(), newUser3.getDto()));
-        messageService.addConversation(newUser2, Arrays.asList(newUser1.getDto(), newUser3.getDto()));
+
+        //creating conversation with the same users should be blocked
+        Assert.assertFalse(messageService.addConversation(newUser2, Arrays.asList(newUser1.getDto(), newUser3.getDto())));
 
         //check created conversations
         Assert.assertTrue(conversationService.findById(0).isPresent());
-        Assert.assertTrue(conversationService.findById(1).isPresent());
     }
 
     private void messageSendingAndBatchSplitting() throws InvocationTargetException, IllegalAccessException {

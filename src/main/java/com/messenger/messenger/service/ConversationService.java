@@ -1,6 +1,5 @@
 package com.messenger.messenger.service;
 
-import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.ConversationStatus;
 import com.messenger.messenger.model.entity.User;
 import com.messenger.messenger.model.entity.Conversation;
@@ -17,10 +16,31 @@ public class ConversationService {
 
     public boolean addConversation(List<User> usersForConversationCreation, User userCreating){
         usersForConversationCreation.add(userCreating);
-        Conversation newConversation = new Conversation(generateId(), usersForConversationCreation);
-        propagateConversationToUsers(newConversation);
-        conversations.add(newConversation);
-        return true;
+        if( ! isConversationWithTheSameUserSquadAlreadyExist(usersForConversationCreation)) {
+            Conversation newConversation = new Conversation(generateId(), usersForConversationCreation);
+            propagateConversationToUsers(newConversation);
+            conversations.add(newConversation);
+            return true;
+        }
+        return false;
+    }
+
+    private boolean isConversationWithTheSameUserSquadAlreadyExist(List<User> usersForConversationCreation){
+        List<User> clonedUsersForConversationCreation = new ArrayList<>();
+        clonedUsersForConversationCreation.addAll(usersForConversationCreation);
+        for(Conversation conversation : conversations){
+            if(checkIfSquadTheSame(conversation, clonedUsersForConversationCreation)) return true;
+        }
+        return false;
+    }
+
+    private boolean checkIfSquadTheSame(Conversation conversation, List<User> usersForConversationCreation){
+        List<User> usersAlreadyInTheConversation = conversation.getUsersInConversation();
+        for(User userForConversationCreation : usersForConversationCreation){
+            usersAlreadyInTheConversation.remove(userForConversationCreation);
+        }
+        if(usersAlreadyInTheConversation.isEmpty()) return true;
+        else return false;
     }
 
     private void propagateConversationToUsers(Conversation newConversation){
