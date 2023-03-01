@@ -12,7 +12,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -25,6 +24,9 @@ public class UserService {
 
     @Autowired
     private SettingsService settingsService;
+
+    @Autowired
+    private ConversationService conversationService;
 
     private Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -92,6 +94,21 @@ public class UserService {
             if(user.getIdentityKey().equals(identityKey)) return Optional.of(user);
         }
         return Optional.empty();
+    }
+
+    public boolean addUserToUser(User user ,UserDto userDto){
+        List<User> userList = user.getUsersSaved();
+        for(User userFound : userList){
+            if(userFound.getId()==userDto.getUserId()){
+                return false;
+            }
+        }
+        Optional<User> optionalUser = findById(userDto.getUserId());
+        if(optionalUser.isPresent()){
+            userList.add(optionalUser.get());
+            conversationService.addConversation((List<UserDto>) optionalUser.get(), user);
+        }
+        return true;
     }
 
     private Optional<String> getIdentityKey(HttpServletRequest request){

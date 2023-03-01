@@ -55,4 +55,14 @@ public class UserController {
             return ResponseEntity.ok(new ArrayList<>());
         }
     }
+
+    @PostMapping(value = "/addUser")
+    public ResponseEntity<Boolean> addUserToUser(@RequestBody UserDto userDto, HttpServletRequest request){
+        Optional<User> userOptional = userService.findUserByHttpRequest(request);
+        if(userOptional.isPresent()){
+            return ResponseEntity.ok(userService.addUserToUser(userOptional.get(),userDto));
+        } else {
+            return ResponseEntity.ok(false);
+        }
+    }
 }
