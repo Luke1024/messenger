@@ -82,6 +82,7 @@ public class MessageService {
     }
 
     public boolean addConversation(User userRequesting, List<UserDto> userDtos){
-        return conversationService.addConversation(userDtos, userRequesting);
+        List<User> userForConversationCreation = userService.findUsersByDto(userDtos);
+        return conversationService.addConversation(userForConversationCreation, userRequesting);
     }
 }

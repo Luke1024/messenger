@@ -4,7 +4,6 @@ import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.ConversationStatus;
 import com.messenger.messenger.model.entity.User;
 import com.messenger.messenger.model.entity.Conversation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -14,14 +13,10 @@ import java.util.Optional;
 @Service
 public class ConversationService {
 
-    @Autowired
-    private UserService userService;
-
     private List<Conversation> conversations = new ArrayList<>();
 
-    public boolean addConversation(List<UserDto> userDtoList, User user){
-        List<User> usersForConversationCreation = userService.findUsersByDto(userDtoList);
-        usersForConversationCreation.add(user);
+    public boolean addConversation(List<User> usersForConversationCreation, User userCreating){
+        usersForConversationCreation.add(userCreating);
         Conversation newConversation = new Conversation(generateId(), usersForConversationCreation);
         propagateConversationToUsers(newConversation);
         conversations.add(newConversation);

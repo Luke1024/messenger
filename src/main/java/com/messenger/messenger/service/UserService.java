@@ -2,6 +2,7 @@ package com.messenger.messenger.service;
 
 import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.dto.UserDto;
+import com.messenger.messenger.model.entity.Conversation;
 import com.messenger.messenger.model.entity.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -97,7 +99,7 @@ public class UserService {
     }
 
     public boolean addUserToUser(User user ,UserDto userDto){
-        List<User> userList = user.getUsersSaved();
+        List<User> userList = user.getUsersWithKeyAsDefaultConversation().entrySet().stream().map(u -> u.getValue()).collect(Collectors.toList());
         for(User userFound : userList){
             if(userFound.getId()==userDto.getUserId()){
                 return false;
@@ -106,7 +108,7 @@ public class UserService {
         Optional<User> optionalUser = findById(userDto.getUserId());
         if(optionalUser.isPresent()){
             userList.add(optionalUser.get());
-            conversationService.addConversation((List<UserDto>) optionalUser.get(), user);
+            conversationService.addConversation(Collections.singletonList(optionalUser.get()), user);
         }
         return true;
     }

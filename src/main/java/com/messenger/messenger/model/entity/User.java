@@ -2,9 +2,7 @@ package com.messenger.messenger.model.entity;
 
 import com.messenger.messenger.model.dto.UserDto;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class User {
@@ -12,7 +10,7 @@ public class User {
     private String name;
     private String password;
     private String identityKey;
-    private List<User> usersSaved = new ArrayList<>();
+    private Map<Long, User> usersWithKeyAsDefaultConversation = new HashMap<>();
     private Map<Conversation, ConversationStatus> conversations = new HashMap<>();
 
     public User(String name, String password, String identityKey) {
@@ -37,8 +35,8 @@ public class User {
         return identityKey;
     }
 
-    public List<User> getUsersSaved() {
-        return usersSaved;
+    public Map<Long, User> getUsersWithKeyAsDefaultConversation() {
+        return usersWithKeyAsDefaultConversation;
     }
 
     public Map<Conversation, ConversationStatus> getConversations() {
@@ -46,7 +44,16 @@ public class User {
     }
 
     public UserDto getDto() {
-        return new UserDto(this.id, this.name);
+        return new UserDto(this.id, this.name, -1);
+    }
+
+    public UserDto getDtoWithDefaultConversation(User userRequesting){
+        for(Map.Entry<Long, User> entry : usersWithKeyAsDefaultConversation.entrySet()){
+            if(entry.getValue()==userRequesting){
+                return new UserDto(this.id, this.name, entry.getKey());
+            }
+        }
+        return getDto();
     }
 
     public void setId(long id) {

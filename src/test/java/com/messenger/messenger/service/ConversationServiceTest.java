@@ -36,7 +36,7 @@ public class ConversationServiceTest {
         usersField.setAccessible(true);
         usersField.set(userService, new ArrayList<>(Arrays.asList(newUser1, newUser2)));
 
-        conversationService.addConversation(new ArrayList<>(Arrays.asList(newUser2.getDto())), newUser1);
+        conversationService.addConversation(new ArrayList<>(Arrays.asList(newUser2)), newUser1);
 
         Optional<Conversation> newConversationOptional = conversationService.findById(0);
 
