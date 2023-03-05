@@ -106,9 +106,12 @@ public class UserService {
             }
         }
         Optional<User> optionalUser = findById(userDto.getUserId());
-        if(optionalUser.isPresent()){
-            userList.add(optionalUser.get());
-            conversationService.addConversation(Collections.singletonList(optionalUser.get()), user);
+        if(optionalUser.isPresent()) {
+            Optional<Long> conversationId = conversationService.addConversation(Collections.singletonList(optionalUser.get()), user);
+            if (conversationId.isPresent()) {
+                user.getUsersWithKeyAsDefaultConversation().put(
+                        conversationId.get(), optionalUser.get());
+            } else return false;
         }
         return true;
     }

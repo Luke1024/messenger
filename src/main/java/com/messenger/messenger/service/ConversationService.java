@@ -14,15 +14,15 @@ public class ConversationService {
 
     private List<Conversation> conversations = new ArrayList<>();
 
-    public boolean addConversation(List<User> usersForConversationCreation, User userCreating){
+    public Optional<Long> addConversation(List<User> usersForConversationCreation, User userCreating){
         usersForConversationCreation.add(userCreating);
         if( ! isConversationWithTheSameUserSquadAlreadyExist(usersForConversationCreation)) {
             Conversation newConversation = new Conversation(generateId(), usersForConversationCreation);
             propagateConversationToUsers(newConversation);
             conversations.add(newConversation);
-            return true;
+            return Optional.of(newConversation.getId());
         }
-        return false;
+        return Optional.empty();
     }
 
     private boolean isConversationWithTheSameUserSquadAlreadyExist(List<User> usersForConversationCreation){

@@ -83,6 +83,7 @@ public class MessageService {
 
     public boolean addConversation(User userRequesting, List<UserDto> userDtos){
         List<User> userForConversationCreation = userService.findUsersByDto(userDtos);
-        return conversationService.addConversation(userForConversationCreation, userRequesting);
+        Optional<Long> conversationId = conversationService.addConversation(userForConversationCreation, userRequesting);
+        return conversationId.isPresent();
     }
 }
