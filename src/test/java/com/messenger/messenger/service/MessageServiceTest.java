@@ -58,7 +58,7 @@ public class MessageServiceTest {
 
     private void creatingConversation(){
         //creating conversations
-        messageService.addConversation(newUser1 ,Arrays.asList(newUser2.getDto(), newUser3.getDto()));
+        Assert.assertTrue(messageService.addConversation(newUser1 ,Arrays.asList(newUser2.getDto(), newUser3.getDto())));
 
         //creating conversation with the same users should be blocked
         Assert.assertFalse(messageService.addConversation(newUser2, Arrays.asList(newUser1.getDto(), newUser3.getDto())));
@@ -69,13 +69,14 @@ public class MessageServiceTest {
 
     private void messageSendingAndBatchSplitting() throws InvocationTargetException, IllegalAccessException {
         //newUser1 sending first message
-        messageService.send(
+        Assert.assertTrue(messageService.send(
                 newUser1,
-                new SendMessageDto(0, "Hello fellow users."));
+                new SendMessageDto(0, "Hello fellow users.")));
         //is new message batch created
         Assert.assertTrue(conversationService.findById(0).get().getMessageBatch(newUser2,0).isPresent());
         //is message there
-        Assert.assertEquals("Hello fellow users.", conversationService.findById(0).get().getMessageBatch(newUser2,0).get().getMessages().get(0).getContent());
+        Assert.assertEquals("Hello fellow users.", conversationService.findById(0).get()
+                .getMessageBatch(newUser2,0).get().getMessages().get(0).getContent());
 
         //add message count necessary to create second batch
 
@@ -104,16 +105,10 @@ public class MessageServiceTest {
 
             List<User> users = new ArrayList<>(Arrays.asList(newUser1, newUser2, newUser3));
 
-            List<Conversation> createdConversations = new ArrayList<>(Arrays.asList(
-                    conversationService.findById(0).get(),
-                    conversationService.findById(1).get()
-            ));
+            Conversation createdConversation = conversationService.findById(0).get();
 
-            //all user requesting last batch in every conversation to reset conversation statuses
             for(User user : users){
-                for(Conversation conversation : createdConversations){
-                   messageService.loadLastBatch(user, conversation.getId());
-                }
+                messageService.loadLastBatch(user, createdConversation.getId());
             }
 
             //waiting message count in conversation status should be 0
@@ -131,7 +126,8 @@ public class MessageServiceTest {
             //new user1 writing something in conversation id 0
             messageService.send(newUser1, new SendMessageDto(0, "Hello again fellow users. I'm, still here."));
 
-            Assert.assertTrue(messageService.isStatusChanged(newUser1));
+            boolean isStatusChanged = messageService.isStatusChanged(newUser1);
+            Assert.assertTrue(isStatusChanged);
             Assert.assertTrue(messageService.isStatusChanged(newUser2));
             Assert.assertTrue(messageService.isStatusChanged(newUser3));
 
