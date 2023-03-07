@@ -110,7 +110,7 @@ public class ConversationServiceTest {
 
             //waiting message count in conversation status should be 0
             for(User user : users){
-                for(ConversationStatusDto conversationStatusDto : conversationService.getConversationStatus(user)){
+                for(ConversationStatusDto conversationStatusDto : conversationService.getStatus(user)){
                     Assert.assertTrue(conversationStatusDto.getWaitingMessages() == 0 );
                 }
             }
@@ -132,7 +132,7 @@ public class ConversationServiceTest {
             Assert.assertTrue(conversationService.isStatusChanged(newUser2));
 
             List<ConversationStatusDto> conversationStatusDtos =
-                    conversationService.getConversationStatus(newUser2).stream().filter(
+                    conversationService.getStatus(newUser2).stream().filter(
                             conversationStatusDto -> conversationStatusDto.getConversationId()==0).collect(Collectors.toList());
 
 

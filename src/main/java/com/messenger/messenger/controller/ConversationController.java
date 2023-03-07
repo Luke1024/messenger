@@ -19,7 +19,7 @@ import java.util.Optional;
 public class ConversationController {
 
     @Autowired
-    private ConversationService messageService;
+    private ConversationService conversationService;
 
     @Autowired
     private UserService userService;
@@ -28,7 +28,7 @@ public class ConversationController {
     public ResponseEntity<Boolean> isStatusNew(HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()) {
-            return ResponseEntity.ok(messageService.isStatusChanged(userOptional.get()));
+            return ResponseEntity.ok(conversationService.isStatusChanged(userOptional.get()));
         } else {
             return ResponseEntity.ok(false);
         }
@@ -38,9 +38,9 @@ public class ConversationController {
     public ResponseEntity<List<ConversationStatusDto>> getConversationStatus(HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()) {
-            return ResponseEntity.ok(messageService.getConversationStatus(userOptional.get()));
+            return ResponseEntity.ok(conversationService.getStatus(userOptional.get()));
         } else {
-            return ResponseEntity.ok(new ArrayList<>());
+            return ResponseEntity.ok(null);
         }
     }
 
@@ -48,7 +48,7 @@ public class ConversationController {
     public ResponseEntity<List<MessageDto>> getNewMessages(long conversationId, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
-            return ResponseEntity.ok(messageService.getNewMessages(userOptional.get(), conversationId));
+            return ResponseEntity.ok(conversationService.getNewMessages(userOptional.get(), conversationId));
         } else {
             return ResponseEntity.ok(new ArrayList<>());
         }
@@ -58,7 +58,7 @@ public class ConversationController {
     public ResponseEntity<BatchDto> getLastMessageBatch(long conversationId, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
-            Optional<BatchDto> optionalBatchDto = messageService.loadLastBatch(userOptional.get(), conversationId);
+            Optional<BatchDto> optionalBatchDto = conversationService.loadLastBatch(userOptional.get(), conversationId);
             if(optionalBatchDto.isPresent()){
                 return ResponseEntity.ok(optionalBatchDto.get());
             }
@@ -70,7 +70,7 @@ public class ConversationController {
     public ResponseEntity<BatchDto> getMessageBatch(long conversationId, long batchId, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()) {
-            Optional<BatchDto> optionalBatchDto = messageService.loadBatch(userOptional.get(), conversationId, batchId);
+            Optional<BatchDto> optionalBatchDto = conversationService.loadBatch(userOptional.get(), conversationId, batchId);
             if (optionalBatchDto.isPresent()) {
                 return ResponseEntity.ok(optionalBatchDto.get());
             }
@@ -82,7 +82,7 @@ public class ConversationController {
     public ResponseEntity<Boolean> sendMessage(@RequestBody SendMessageDto sendMessageDto, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
-            return ResponseEntity.ok(messageService.send(userOptional.get(), sendMessageDto));
+            return ResponseEntity.ok(conversationService.send(userOptional.get(), sendMessageDto));
         } else {
             return ResponseEntity.ok(false);
         }
@@ -93,7 +93,7 @@ public class ConversationController {
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
             List<User> userFound = userService.findUsersByDto(userDtos);
-            return ResponseEntity.ok(messageService.addConversation(userOptional.get(), userFound));
+            return ResponseEntity.ok(conversationService.addConversation(userOptional.get(), userFound));
         } else {
             return ResponseEntity.ok(false);
         }

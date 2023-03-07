@@ -12,10 +12,8 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -65,21 +63,6 @@ public class UserService {
 
     public List<User> findUsersByDto(List<UserDto> userDtos){
         return userFinder.findUsersByDto(userDtos, users);
-    }
-
-    public boolean addUserToUser(User user ,UserDto userDto){
-        List<User> userList = user.getUsersWithKeyAsDefaultConversation().entrySet().stream().map(u -> u.getValue()).collect(Collectors.toList());
-        for(User userFound : userList){
-            if(userFound.getId()==userDto.getUserId()){
-                return false;
-            }
-        }
-        Optional<User> optionalUser = userFinder.findById(userDto.getUserId(), users);
-        if(optionalUser.isPresent()) {
-            user.getUsersWithKeyAsDefaultConversation().put(-1L, optionalUser.get());
-            return true;
-        }
-        return false;
     }
 
     private boolean isRegistrationAllowed(UserDataDto userDataDto){

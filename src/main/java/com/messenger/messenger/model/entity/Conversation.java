@@ -10,12 +10,14 @@ import java.util.Optional;
 public class Conversation {
     private long id;
     private List<User> usersInConversation;
+    private boolean direct;
     private List<MessageBatch> messageBatches = new ArrayList<>();
     private SettingsService settingsService = new SettingsService();
 
-    public Conversation(long id, List<User> users) {
+    public Conversation(long id, List<User> users, boolean direct) {
         this.id = id;
         this.usersInConversation = users;
+        this.direct = direct;
     }
 
     public long getId() {
@@ -26,6 +28,10 @@ public class Conversation {
         MessageBatch currentBatch = getCurrentBatch();
         addMessageToBatch(currentBatch,message);
         informUsers(message);
+    }
+
+    public boolean isDirect() {
+        return direct;
     }
 
     public List<Message> getOnlyNewMessages(User user){

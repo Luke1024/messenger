@@ -20,18 +20,21 @@ public class ConversationService {
     private MessageMapper messageMapper;
 
     @Autowired
-    private UserService userService;
-
-    @Autowired
     private ConversationDuplicationDetector duplicatorDetector;
 
     private List<Conversation> conversations = new ArrayList<>();
 
     public Boolean isStatusChanged(User userRequesting){
-        return userRequesting.isConversationStatusChanged();
+        List<ConversationStatus> conversationStatuses =
+                userRequesting.getConversations().entrySet().stream()
+                        .map(status -> status.getValue()).collect(Collectors.toList());
+        for(ConversationStatus status : conversationStatuses){
+            if(status.isThereSomethingNew()) return true;
+        }
+        return false;
     }
 
-    public List<ConversationStatusDto> getConversationStatus(User userRequesting){
+    public List<ConversationStatusDto> getStatus(User userRequesting){
         return userRequesting.getConversations()
                 .entrySet().stream()
                 .map(conversationEntry -> convertToConversationStatusDto(conversationEntry.getKey(), conversationEntry.getValue()))
@@ -68,7 +71,8 @@ public class ConversationService {
     private ConversationStatusDto convertToConversationStatusDto(Conversation conversation, ConversationStatus conversationStatus){
         return new ConversationStatusDto(conversation.getId(),
                 conversation.getUsersInConversation().stream().map(user -> user.getDto()).collect(Collectors.toList()),
-                conversationStatus.getNotificationCount());
+                conversationStatus.getNotificationCount(),
+                conversation.isDirect());
     }
 
     public boolean send(User userRequesting, SendMessageDto sendMessageDto){
@@ -90,13 +94,23 @@ public class ConversationService {
 
     public Optional<Long> addConversation(List<User> usersForConversationCreation, User userCreating){
         usersForConversationCreation.add(userCreating);
-        if( ! duplicatorDetector.isConversationWithTheSameUserSquadAlreadyExist(usersForConversationCreation, conversations)) {
-            Conversation newConversation = new Conversation(generateId(), usersForConversationCreation);
-            propagateConversationToUsers(newConversation);
-            conversations.add(newConversation);
-            return Optional.of(newConversation.getId());
+        boolean directConversationBetweenUsers = false;
+        if(usersForConversationCreation.size()==2) directConversationBetweenUsers = true;
+        if(usersForConversationCreation.size() != 1){
+            if( ! isConversationDuplicated(usersForConversationCreation)) {
+                if(usersForConversationCreation.size() != 1) {
+                    Conversation newConversation = new Conversation(generateId(), usersForConversationCreation, directConversationBetweenUsers);
+                    propagateConversationToUsers(newConversation);
+                    conversations.add(newConversation);
+                    return Optional.of(newConversation.getId());
+                }
+            }
         }
         return Optional.empty();
+    }
+
+    private boolean isConversationDuplicated(List<User> usersForConversationCreation){
+        return duplicatorDetector.isConversationWithTheSameUserSquadAlreadyExist(usersForConversationCreation, conversations);
     }
 
     private void propagateConversationToUsers(Conversation newConversation){
