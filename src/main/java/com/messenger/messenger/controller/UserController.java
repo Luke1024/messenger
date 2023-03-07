@@ -50,7 +50,7 @@ public class UserController {
     public ResponseEntity<List<UserDto>> findUser(HttpServletRequest request, @PathVariable String userName){
         Optional<User> userOptional = userService.findUserByHttpRequest(request);
         if (userOptional.isPresent()) {
-            return ResponseEntity.ok(userService.findUsers(userName));
+            return ResponseEntity.ok(userService.findUsersByNameToDto(userName));
         } else {
             return ResponseEntity.ok(new ArrayList<>());
         }

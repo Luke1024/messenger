@@ -106,7 +106,7 @@ public class UserServiceTest {
             Assert.assertEquals(user, userService.findByIdentityKey(user.getIdentityKey()).get());
         }
 
-        Assert.assertEquals(userList.get(0).getDto().getUserName(), userService.findUsers("1").get(0).getUserName());
+        Assert.assertEquals(userList.get(0).getDto().getUserName(), userService.findUsersByName("1").get(0).getUserName());
     }
 
 

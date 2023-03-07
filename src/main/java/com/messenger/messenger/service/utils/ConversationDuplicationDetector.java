@@ -10,21 +10,28 @@ import java.util.List;
 @Component
 public class ConversationDuplicationDetector {
 
-    public boolean isConversationWithTheSameUserSquadAlreadyExist(List<User> usersForConversationCreation, List<Conversation> conversations){
+    public boolean isConversationWithTheSameUserSquadAlreadyExist(
+            List<User> usersForConversationCreation, List<Conversation> conversations){
         List<User> clonedUsersForConversationCreation = new ArrayList<>();
         clonedUsersForConversationCreation.addAll(usersForConversationCreation);
         for(Conversation conversation : conversations){
-            if(checkIfSquadTheSame(conversation, clonedUsersForConversationCreation)) return true;
+            if(checkIfSquadTheSame(conversation, clonedUsersForConversationCreation)){
+                return true;
+            }
         }
         return false;
     }
 
-    private boolean checkIfSquadTheSame(Conversation conversation, List<User> usersForConversationCreation){
+    private boolean checkIfSquadTheSame(
+            Conversation conversation, List<User> usersForConversationCreation){
         List<User> usersAlreadyInTheConversation = conversation.getUsersInConversation();
         for(User userInConversation : usersAlreadyInTheConversation){
             usersForConversationCreation.remove(userInConversation);
         }
-        if(usersForConversationCreation.isEmpty()) return true;
-        else return false;
+        if(usersForConversationCreation.isEmpty()){
+            return true;
+        } else {
+            return false;
+        }
     }
 }
