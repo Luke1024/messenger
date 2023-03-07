@@ -2,7 +2,7 @@ package com.messenger.messenger.controller;
 
 import com.messenger.messenger.model.dto.*;
 import com.messenger.messenger.model.entity.User;
-import com.messenger.messenger.service.MessageService;
+import com.messenger.messenger.service.ConversationService;
 import com.messenger.messenger.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,10 +16,10 @@ import java.util.Optional;
 @CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(value = "/message")
-public class MessageController {
+public class ConversationController {
 
     @Autowired
-    private MessageService messageService;
+    private ConversationService messageService;
 
     @Autowired
     private UserService userService;
@@ -92,7 +92,8 @@ public class MessageController {
     public ResponseEntity<Boolean> addConversation(HttpServletRequest request, @RequestBody List<UserDto> userDtos){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
-            return ResponseEntity.ok(messageService.addConversation(userOptional.get(), userDtos));
+            List<User> userFound = userService.findUsersByDto(userDtos);
+            return ResponseEntity.ok(messageService.addConversation(userOptional.get(), userFound));
         } else {
             return ResponseEntity.ok(false);
         }

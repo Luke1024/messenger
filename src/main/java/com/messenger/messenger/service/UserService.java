@@ -27,9 +27,6 @@ public class UserService {
     private SettingsService settingsService;
 
     @Autowired
-    private ConversationService conversationService;
-
-    @Autowired
     private UserFinder userFinder;
 
     private Logger logger = LoggerFactory.getLogger(UserService.class);
@@ -79,13 +76,10 @@ public class UserService {
         }
         Optional<User> optionalUser = userFinder.findById(userDto.getUserId(), users);
         if(optionalUser.isPresent()) {
-            Optional<Long> conversationId = conversationService.addConversation(Collections.singletonList(optionalUser.get()), user);
-            if (conversationId.isPresent()) {
-                user.getUsersWithKeyAsDefaultConversation().put(
-                        conversationId.get(), optionalUser.get());
-            } else return false;
+            user.getUsersWithKeyAsDefaultConversation().put(-1L, optionalUser.get());
+            return true;
         }
-        return true;
+        return false;
     }
 
     private boolean isRegistrationAllowed(UserDataDto userDataDto){
