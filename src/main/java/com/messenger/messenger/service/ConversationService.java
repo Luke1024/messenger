@@ -5,6 +5,7 @@ import com.messenger.messenger.model.entity.*;
 import com.messenger.messenger.service.mapper.MessageMapper;
 import com.messenger.messenger.service.utils.ConversationDuplicationDetector;
 import com.messenger.messenger.service.utils.ConversationFinder;
+import com.messenger.messenger.service.utils.MessageAcquirer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,9 @@ public class ConversationService {
 
     @Autowired
     private ConversationFinder conversationFinder;
+
+    @Autowired
+    private MessageAcquirer messageAcquirer;
 
     @Autowired
     private SettingsService settingsService;
@@ -49,16 +53,7 @@ public class ConversationService {
     }
 
     public List<MessageDto> getNewMessages(User userRequesting, long conversationId){
-        Optional<Conversation> optionalConversation = findById(conversationId);
-        if(optionalConversation.isPresent()){
-            Conversation conversation = optionalConversation.get();
-            ConversationStatus conversationStatus = userRequesting.getConversations().get(conversation);
-            List<Message> newMessages = new ArrayList<>();
-            newMessages.addAll(conversationStatus.getWaitingMessages());
-            clearConversationStatus(conversationStatus);
-            return messageMapper.mapToDtoList(newMessages);
-        }
-        return new ArrayList<>();
+        return messageMapper.mapToDtoList(messageAcquirer.getNewMessages(userRequesting, conversationId, conversations));
     }
 
     private void clearConversationStatus(ConversationStatus conversationStatus){
@@ -66,48 +61,13 @@ public class ConversationService {
     }
 
     public Optional<BatchDto> loadLastBatch(User user, long conversationId) {
-        Optional<Conversation> optionalConversation = findById(conversationId);
-        if(optionalConversation.isPresent()){
-            return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
-                    getLastMessageBatch(user, optionalConversation.get().getMessageBatches()));
-        } else {
-            return Optional.empty();
-        }
+        return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
+                    messageAcquirer.loadLastBatch(user, conversationId, conversations));
     }
 
-    public Optional<MessageBatch> getLastMessageBatch(User user, List<MessageBatch> messageBatches){
-        ConversationStatus conversationStatus = user.getConversations().get(this);
-        if(conversationStatus != null){
-            clearConversationStatus(conversationStatus);
-            if( ! messageBatches.isEmpty()){
-                return Optional.of(messageBatches.get(messageBatches.size()-1));
-            }
-        }
-        return Optional.empty();
-    }
-
-    public Optional<BatchDto> loadBatch(User userRequesting, long conversationId, long batchId) {
-        Optional<Conversation> optionalConversation = findById(conversationId);
-        if (optionalConversation.isPresent()) {
-            return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
-                    getMessageBatch(userRequesting, (int) batchId, optionalConversation.get().getMessageBatches()));
-        }
-        return Optional.empty();
-    }
-
-    public Optional<MessageBatch> getMessageBatch(User user, int batchIndex, List<MessageBatch> messageBatches) {
-        ConversationStatus conversationStatus = user.getConversations().get(this);
-        if(conversationStatus != null) {
-            clearConversationStatus(conversationStatus);
-            if (isBatchIndexInRange(batchIndex, messageBatches)) {
-                return Optional.of(messageBatches.get(batchIndex));
-            }
-        }
-        return Optional.empty();
-    }
-
-    private boolean isBatchIndexInRange(int batchIndex, List<MessageBatch> messageBatches){
-        return batchIndex >= 0 && messageBatches.size() > batchIndex;
+    public Optional<BatchDto> loadBatch(User userRequesting, long conversationId, long batchId){
+        return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
+                messageAcquirer.loadBatch(userRequesting, conversationId, batchId, conversations));
     }
 
     private ConversationStatusDto convertToConversationStatusDto(Conversation conversation, ConversationStatus conversationStatus){
