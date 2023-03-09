@@ -6,10 +6,10 @@ import com.messenger.messenger.service.mapper.MessageMapper;
 import com.messenger.messenger.service.utils.ConversationDuplicationDetector;
 import com.messenger.messenger.service.utils.ConversationFinder;
 import com.messenger.messenger.service.utils.MessageAcquirer;
+import com.messenger.messenger.service.utils.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +29,9 @@ public class ConversationService {
 
     @Autowired
     private MessageAcquirer messageAcquirer;
+
+    @Autowired
+    private MessageSender messageSender;
 
     @Autowired
     private SettingsService settingsService;
@@ -56,10 +59,6 @@ public class ConversationService {
         return messageMapper.mapToDtoList(messageAcquirer.getNewMessages(userRequesting, conversationId, conversations));
     }
 
-    private void clearConversationStatus(ConversationStatus conversationStatus){
-        conversationStatus.clearStatus();
-    }
-
     public Optional<BatchDto> loadLastBatch(User user, long conversationId) {
         return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
                     messageAcquirer.loadLastBatch(user, conversationId, conversations));
@@ -78,78 +77,7 @@ public class ConversationService {
     }
 
     public boolean send(User userRequesting, SendMessageDto sendMessageDto){
-        Optional<Conversation> optionalConversation = findById(sendMessageDto.getConversationId());
-        if(optionalConversation.isPresent()){
-            Message newMessage = new Message(
-                    sendMessageDto.getContent(),
-                    LocalDateTime.now(),
-                    userRequesting,
-                    optionalConversation.get());
-
-            addMessage(optionalConversation.get(), newMessage);
-            return true;
-        } else return false;
-    }
-
-    private void addMessage(Conversation conversation, Message newMessage){
-        MessageBatch currenctBatch = getCurrentBatch(conversation.getMessageBatches());
-        addMessageToBatch(currenctBatch, newMessage);
-        informUsers(newMessage, conversation.getUsersInConversation());
-    }
-
-    private MessageBatch getCurrentBatch(List<MessageBatch> messageBatches){
-
-        if(messageBatches.isEmpty()){
-            MessageBatch newMessageBatch = new MessageBatch(0);
-            messageBatches.add(newMessageBatch);
-            return newMessageBatch;
-        }
-        if( ! messageBatches.isEmpty()){
-            MessageBatch lastMessageBatch = messageBatches.get(messageBatches.size()-1);
-            if(lastMessageBatch.getMessages().size() > settingsService.messageCountInBatch-1){
-                MessageBatch newMessageBatch = new MessageBatch(generateBatchId(messageBatches));
-                messageBatches.add(newMessageBatch);
-                return newMessageBatch;
-            }
-        }
-        return messageBatches.get(messageBatches.size()-1);
-    }
-
-    private long generateBatchId(List<MessageBatch> messageBatches){
-        return messageBatches.get(messageBatches.size()-1).getId()+1;
-    }
-
-    private void informUsers(Message message, List<User> usersInConversation){
-        usersInConversation.stream().forEach(user -> addWaitingMessage(user, message));
-        usersInConversation.stream().filter(user -> user != message.getByUser())
-                .forEach(user -> addNotification(user, message));
-    }
-
-    private void addNotification(User user, Message message){
-        ConversationStatus conversationStatus = user.getConversations().get(this);
-        if(conversationStatus != null) {
-            conversationStatus.addNotification();
-        }
-    }
-
-    private void addWaitingMessage(User user, Message message){
-        ConversationStatus conversationStatus = user.getConversations().get(this);
-        if(conversationStatus != null){
-            conversationStatus.getWaitingMessages().add(message);
-        }
-    }
-
-    private void addMessageToBatch(MessageBatch messageBatch, Message message){
-        if(messageBatch.getMessages().isEmpty()){
-            message.setId(0);
-            message.setMessageBatch(messageBatch);
-        } else {
-            List<Message> messages = messageBatch.getMessages();
-            long newId = messages.get(messages.size()-1).getId() + 1;
-            message.setId(newId);
-            message.setMessageBatch(messageBatch);
-        }
-        messageBatch.getMessages().add(message);
+        return messageSender.send(userRequesting, sendMessageDto, conversations);
     }
 
     public boolean addConversation(User userRequesting, List<User> usersForConversationCreation){
