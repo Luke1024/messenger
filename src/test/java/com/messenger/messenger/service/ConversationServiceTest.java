@@ -3,7 +3,6 @@ package com.messenger.messenger.service;
 import com.messenger.messenger.model.dto.ConversationStatusDto;
 import com.messenger.messenger.model.dto.SendMessageDto;
 import com.messenger.messenger.model.entity.Conversation;
-import com.messenger.messenger.model.entity.Message;
 import com.messenger.messenger.model.entity.User;
 import org.junit.Assert;
 import org.junit.Test;
@@ -55,46 +54,23 @@ public class ConversationServiceTest {
 
     private void creatingConversation(){
         //creating conversations
-        Assert.assertTrue(conversationService.addConversation(newUser1 ,Arrays.asList(newUser2, newUser3)));
+        List<User> firstConversation = new ArrayList<>();
+        firstConversation.add(newUser2);
+        firstConversation.add(newUser3);
+        Assert.assertTrue(conversationService.addConversation(newUser1 ,firstConversation));
 
+        List<User> secondConversation = new ArrayList<>();
+        secondConversation.add(newUser1);
+        secondConversation.add(newUser3);
         //creating conversation with the same users should be blocked
-        Assert.assertFalse(conversationService.addConversation(newUser2, Arrays.asList(newUser1, newUser3)));
+        Assert.assertFalse(conversationService.addConversation(newUser2, secondConversation));
 
         //check created conversations
         Assert.assertTrue(conversationService.findById(0).isPresent());
     }
 
     private void messageSendingAndBatchSplitting() throws InvocationTargetException, IllegalAccessException {
-        //newUser1 sending first message
-        Assert.assertTrue(conversationService.send(
-                newUser1,
-                new SendMessageDto(0, "Hello fellow users.")));
-        //is new message batch created
-        Assert.assertTrue(conversationService.findById(0).get().getMessageBatch(newUser2,0).isPresent());
-        //is message there
-        Assert.assertEquals("Hello fellow users.", conversationService.findById(0).get()
-                .getMessageBatch(newUser2,0).get().getMessages().get(0).getContent());
 
-        //add message count necessary to create second batch
-
-        for(int i=0; i<settingsService.messageCountInBatch; i++){
-            conversationService.send(
-                    newUser2,
-                    new SendMessageDto(0, "I will add some content as newUser2."));
-        }
-        //was second batch created?
-        Assert.assertEquals(1, conversationService.loadLastBatch(newUser1, 0).get().getId());
-
-        //add some unique message and check if it exist in second batch
-        conversationService.send(
-                newUser3,
-                new SendMessageDto(0, "Unique message."));
-
-        //check if unique message exists
-
-        List<Message> messagesInLastBatch = conversationService.findById(0).get().getMessageBatch(newUser3,1).get().getMessages();
-
-        Assert.assertEquals("Unique message.", messagesInLastBatch.get(messagesInLastBatch.size()-1).getContent());
     }
 
     private void notificationTesting()

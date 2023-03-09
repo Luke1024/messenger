@@ -24,13 +24,15 @@ public class ConversationStatus {
         notificationCount++;
     }
 
-    public void clearStatus(){
-        notificationCount=0;
-        somethingChanged=false;
-        waitingMessages.clear();
-    }
-
     public boolean isThereSomethingNew(){
         return somethingChanged;
+    }
+
+    public void setNotificationCount(int notificationCount) {
+        this.notificationCount = notificationCount;
+    }
+
+    public void setSomethingChanged(boolean somethingChanged) {
+        this.somethingChanged = somethingChanged;
     }
 }

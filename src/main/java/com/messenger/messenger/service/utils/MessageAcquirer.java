@@ -6,13 +6,15 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class MessageAcquirer {
 
+    public List<Message> getNewMessages(User userRequesting, long conversationId){
+        List<Conversation> userConversations = getUserConversations(userRequesting);
+        Optional<Conversation> optionalConversation = findById(conversationId, userConversations);
 
-    public List<Message> getNewMessages(User userRequesting, long conversationId, List<Conversation> conversations){
-        Optional<Conversation> optionalConversation = findById(conversationId, conversations);
         if(optionalConversation.isPresent()){
             Conversation conversation = optionalConversation.get();
             ConversationStatus conversationStatus = userRequesting.getConversations().get(conversation);
@@ -24,15 +26,8 @@ public class MessageAcquirer {
         return new ArrayList<>();
     }
 
-    private Optional<Conversation> findById(long id, List<Conversation> conversations){
-        for(Conversation conversation : conversations){
-            if(conversation.getId() == id) return Optional.of(conversation);
-        }
-        return Optional.empty();
-    }
-
-    public Optional<MessageBatch> loadLastBatch(User user, long conversationId, List<Conversation> conversations){
-        Optional<Conversation> optionalConversation = findById(conversationId, conversations);
+    public Optional<MessageBatch> loadLastBatch(User user, long conversationId){
+        Optional<Conversation> optionalConversation = findById(conversationId, getUserConversations(user));
         if(optionalConversation.isPresent()){
             return getLastMessageBatch(user, optionalConversation.get().getMessageBatches());
         } else {
@@ -40,10 +35,22 @@ public class MessageAcquirer {
         }
     }
 
-    public Optional<MessageBatch> loadBatch(User userRequesting, long conversationId, long batchId, List<Conversation> conversations) {
-        Optional<Conversation> optionalConversation = findById(conversationId, conversations);
+    public Optional<MessageBatch> loadBatch(User userRequesting, long conversationId, long batchId) {
+        Optional<Conversation> optionalConversation = findById(conversationId, getUserConversations(userRequesting));
         if (optionalConversation.isPresent()) {
             return getMessageBatch(userRequesting, (int) batchId, optionalConversation.get().getMessageBatches());
+        }
+        return Optional.empty();
+    }
+
+    private List<Conversation> getUserConversations(User user){
+        return user.getConversations().entrySet().stream()
+                .map(entry -> entry.getKey()).collect(Collectors.toList());
+    }
+
+    private Optional<Conversation> findById(long id, List<Conversation> conversations){
+        for(Conversation conversation : conversations){
+            if(conversation.getId() == id) return Optional.of(conversation);
         }
         return Optional.empty();
     }
@@ -51,8 +58,8 @@ public class MessageAcquirer {
     private Optional<MessageBatch> getMessageBatch(User user, int batchIndex, List<MessageBatch> messageBatches) {
         ConversationStatus conversationStatus = user.getConversations().get(this);
         if(conversationStatus != null) {
-            clearConversationStatus(conversationStatus);
             if (isBatchIndexInRange(batchIndex, messageBatches)) {
+                clearConversationStatus(conversationStatus);
                 return Optional.of(messageBatches.get(batchIndex));
             }
         }
@@ -75,6 +82,8 @@ public class MessageAcquirer {
     }
 
     private void clearConversationStatus(ConversationStatus conversationStatus){
-        conversationStatus.clearStatus();
+        conversationStatus.getWaitingMessages().clear();
+        conversationStatus.setNotificationCount(0);
+        conversationStatus.setSomethingChanged(false);
     }
 }

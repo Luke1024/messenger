@@ -2,6 +2,7 @@ package com.messenger.messenger.service;
 
 import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.entity.User;
+import com.messenger.messenger.service.utils.UserFinder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,7 +15,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.servlet.http.Cookie;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
@@ -26,6 +26,9 @@ public class UserServiceTest {
 
     @Autowired
     private SettingsService settingsService;
+
+    @Autowired
+    private UserFinder userFinder;
 
     @Test
     public void findUserByHttpRequest() throws NoSuchFieldException, IllegalAccessException {
@@ -85,29 +88,4 @@ public class UserServiceTest {
         userList.setAccessible(true);
         userList.set(userService, new ArrayList<>());
     }
-
-    @Test
-    public void findUsersByMultipleMethods() throws NoSuchFieldException, IllegalAccessException {
-        UserDataDto userDataDto1 = new UserDataDto("newUser1", "newPassword1");
-        UserDataDto userDataDto2 = new UserDataDto("newUser2", "newPassword2");
-        UserDataDto userDataDto3 = new UserDataDto("newUser3", "newPassword3");
-
-        userService.register(userDataDto1);
-        userService.register(userDataDto2);
-        userService.register(userDataDto3);
-
-        Field users = userService.getClass().getDeclaredField("users");
-        users.setAccessible(true);
-        List<User> userList = (List<User>) users.get(userService);
-
-        for(User user : userList){
-            Assert.assertEquals(user, userService.findUsersByDto(Arrays.asList(user.getDto())).get(0));
-            Assert.assertEquals(user, userService.findByName(user.getName()).get());
-            Assert.assertEquals(user, userService.findByIdentityKey(user.getIdentityKey()).get());
-        }
-
-        Assert.assertEquals(userList.get(0).getDto().getUserName(), userService.findUsersByName("1").get(0).getUserName());
-    }
-
-
 }

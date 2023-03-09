@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class MessageSender {
@@ -16,8 +17,8 @@ public class MessageSender {
     @Autowired
     private SettingsService settingsService;
 
-    public boolean send(User userRequesting, SendMessageDto sendMessageDto, List<Conversation> conversations){
-        Optional<Conversation> optionalConversation = findById(sendMessageDto.getConversationId(), conversations);
+    public boolean send(User userRequesting, SendMessageDto sendMessageDto){
+        Optional<Conversation> optionalConversation = findById(sendMessageDto.getConversationId(), getUserConversations(userRequesting));
         if(optionalConversation.isPresent()){
             Message newMessage = new Message(
                     sendMessageDto.getContent(),
@@ -30,6 +31,18 @@ public class MessageSender {
         } else return false;
     }
 
+    private List<Conversation> getUserConversations(User user){
+        return user.getConversations().entrySet().stream()
+                .map(entry -> entry.getKey()).collect(Collectors.toList());
+    }
+
+    private Optional<Conversation> findById(long id, List<Conversation> conversations){
+        for(Conversation conversation : conversations){
+            if(conversation.getId() == id) return Optional.of(conversation);
+        }
+        return Optional.empty();
+    }
+
     private void addMessage(Conversation conversation, Message newMessage){
         MessageBatch currenctBatch = getCurrentBatch(conversation.getMessageBatches());
         addMessageToBatch(currenctBatch, newMessage);
@@ -37,7 +50,6 @@ public class MessageSender {
     }
 
     private MessageBatch getCurrentBatch(List<MessageBatch> messageBatches){
-
         if(messageBatches.isEmpty()){
             MessageBatch newMessageBatch = new MessageBatch(0);
             messageBatches.add(newMessageBatch);
@@ -69,13 +81,6 @@ public class MessageSender {
             message.setMessageBatch(messageBatch);
         }
         messageBatch.getMessages().add(message);
-    }
-
-    public Optional<Conversation> findById(long id, List<Conversation> conversations){
-        for(Conversation conversation : conversations){
-            if(conversation.getId() == id) return Optional.of(conversation);
-        }
-        return Optional.empty();
     }
 
     private void informUsers(Message message, List<User> usersInConversation){

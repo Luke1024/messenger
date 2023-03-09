@@ -4,7 +4,6 @@ import com.messenger.messenger.model.dto.*;
 import com.messenger.messenger.model.entity.*;
 import com.messenger.messenger.service.mapper.MessageMapper;
 import com.messenger.messenger.service.utils.ConversationDuplicationDetector;
-import com.messenger.messenger.service.utils.ConversationFinder;
 import com.messenger.messenger.service.utils.MessageAcquirer;
 import com.messenger.messenger.service.utils.MessageSender;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +22,6 @@ public class ConversationService {
 
     @Autowired
     private ConversationDuplicationDetector duplicatorDetector;
-
-    @Autowired
-    private ConversationFinder conversationFinder;
 
     @Autowired
     private MessageAcquirer messageAcquirer;
@@ -56,17 +52,17 @@ public class ConversationService {
     }
 
     public List<MessageDto> getNewMessages(User userRequesting, long conversationId){
-        return messageMapper.mapToDtoList(messageAcquirer.getNewMessages(userRequesting, conversationId, conversations));
+        return messageMapper.mapToDtoList(messageAcquirer.getNewMessages(userRequesting, conversationId));
     }
 
     public Optional<BatchDto> loadLastBatch(User user, long conversationId) {
         return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
-                    messageAcquirer.loadLastBatch(user, conversationId, conversations));
+                    messageAcquirer.loadLastBatch(user, conversationId));
     }
 
     public Optional<BatchDto> loadBatch(User userRequesting, long conversationId, long batchId){
         return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
-                messageAcquirer.loadBatch(userRequesting, conversationId, batchId, conversations));
+                messageAcquirer.loadBatch(userRequesting, conversationId, batchId));
     }
 
     private ConversationStatusDto convertToConversationStatusDto(Conversation conversation, ConversationStatus conversationStatus){
@@ -77,7 +73,7 @@ public class ConversationService {
     }
 
     public boolean send(User userRequesting, SendMessageDto sendMessageDto){
-        return messageSender.send(userRequesting, sendMessageDto, conversations);
+        return messageSender.send(userRequesting, sendMessageDto);
     }
 
     public boolean addConversation(User userRequesting, List<User> usersForConversationCreation){
