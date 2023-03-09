@@ -1,5 +1,6 @@
 package com.messenger.messenger.service.utils;
 
+import com.messenger.messenger.model.dto.ConversationStatusDto;
 import com.messenger.messenger.model.entity.*;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,30 @@ import java.util.stream.Collectors;
 
 @Component
 public class MessageAcquirer {
+
+    public Boolean isStatusChanged(User userRequesting){
+        List<ConversationStatus> conversationStatuses =
+                userRequesting.getConversations().entrySet().stream()
+                        .map(status -> status.getValue()).collect(Collectors.toList());
+        for(ConversationStatus status : conversationStatuses){
+            if(status.isThereSomethingNew()) return true;
+        }
+        return false;
+    }
+
+    public List<ConversationStatusDto> getStatus(User userRequesting){
+        return userRequesting.getConversations()
+                .entrySet().stream()
+                .map(conversationEntry -> convertToConversationStatusDto(conversationEntry.getKey(), conversationEntry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    private ConversationStatusDto convertToConversationStatusDto(Conversation conversation, ConversationStatus conversationStatus){
+        return new ConversationStatusDto(conversation.getId(),
+                conversation.getUsersInConversation().stream().map(user -> user.getDto()).collect(Collectors.toList()),
+                conversationStatus.getNotificationCount(),
+                conversation.isDirect());
+    }
 
     public List<Message> getNewMessages(User userRequesting, long conversationId){
         List<Conversation> userConversations = getUserConversations(userRequesting);

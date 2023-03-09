@@ -35,20 +35,11 @@ public class ConversationService {
     private List<Conversation> conversations = new ArrayList<>();
 
     public Boolean isStatusChanged(User userRequesting){
-        List<ConversationStatus> conversationStatuses =
-                userRequesting.getConversations().entrySet().stream()
-                        .map(status -> status.getValue()).collect(Collectors.toList());
-        for(ConversationStatus status : conversationStatuses){
-            if(status.isThereSomethingNew()) return true;
-        }
-        return false;
+        return messageAcquirer.isStatusChanged(userRequesting);
     }
 
     public List<ConversationStatusDto> getStatus(User userRequesting){
-        return userRequesting.getConversations()
-                .entrySet().stream()
-                .map(conversationEntry -> convertToConversationStatusDto(conversationEntry.getKey(), conversationEntry.getValue()))
-                .collect(Collectors.toList());
+        return messageAcquirer.getStatus(userRequesting);
     }
 
     public List<MessageDto> getNewMessages(User userRequesting, long conversationId){
@@ -63,13 +54,6 @@ public class ConversationService {
     public Optional<BatchDto> loadBatch(User userRequesting, long conversationId, long batchId){
         return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
                 messageAcquirer.loadBatch(userRequesting, conversationId, batchId));
-    }
-
-    private ConversationStatusDto convertToConversationStatusDto(Conversation conversation, ConversationStatus conversationStatus){
-        return new ConversationStatusDto(conversation.getId(),
-                conversation.getUsersInConversation().stream().map(user -> user.getDto()).collect(Collectors.toList()),
-                conversationStatus.getNotificationCount(),
-                conversation.isDirect());
     }
 
     public boolean send(User userRequesting, SendMessageDto sendMessageDto){
