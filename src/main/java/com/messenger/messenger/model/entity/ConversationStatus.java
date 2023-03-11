@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ConversationStatus {
     private List<Message> waitingMessages = new ArrayList<>();
-    private int notificationCount;
+    private int notificationCount = 0;
     private boolean somethingChanged = true;
 
     public ConversationStatus() { }

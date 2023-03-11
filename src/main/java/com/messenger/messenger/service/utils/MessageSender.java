@@ -18,14 +18,15 @@ public class MessageSender {
     private SettingsService settingsService;
 
     public boolean send(User userRequesting, SendMessageDto sendMessageDto){
-        Optional<Conversation> optionalConversation = findById(sendMessageDto.getConversationId(), getUserConversations(userRequesting));
+        Optional<Conversation> optionalConversation = findById(sendMessageDto.getConversationId(),
+                getUserConversations(userRequesting));
+
         if(optionalConversation.isPresent()){
             Message newMessage = new Message(
                     sendMessageDto.getContent(),
                     LocalDateTime.now(),
                     userRequesting,
                     optionalConversation.get());
-
             addMessage(optionalConversation.get(), newMessage);
             return true;
         } else return false;
@@ -46,7 +47,7 @@ public class MessageSender {
     private void addMessage(Conversation conversation, Message newMessage){
         MessageBatch currenctBatch = getCurrentBatch(conversation.getMessageBatches());
         addMessageToBatch(currenctBatch, newMessage);
-        informUsers(newMessage, conversation.getUsersInConversation());
+        informUsers(newMessage, conversation.getUsersInConversation(), conversation);
     }
 
     private MessageBatch getCurrentBatch(List<MessageBatch> messageBatches){
@@ -83,21 +84,21 @@ public class MessageSender {
         messageBatch.getMessages().add(message);
     }
 
-    private void informUsers(Message message, List<User> usersInConversation){
-        usersInConversation.stream().forEach(user -> addWaitingMessage(user, message));
+    private void informUsers(Message message, List<User> usersInConversation, Conversation conversation){
+        usersInConversation.stream().forEach(user -> addWaitingMessage(user, message, conversation));
         usersInConversation.stream().filter(user -> user != message.getByUser())
-                .forEach(user -> addNotification(user, message));
+                .forEach(user -> addNotification(user, message, conversation));
     }
 
-    private void addWaitingMessage(User user, Message message){
-        ConversationStatus conversationStatus = user.getConversations().get(this);
+    private void addWaitingMessage(User user, Message message, Conversation currentConversation){
+        ConversationStatus conversationStatus = user.getConversations().get(currentConversation);
         if(conversationStatus != null){
             conversationStatus.getWaitingMessages().add(message);
         }
     }
 
-    private void addNotification(User user, Message message){
-        ConversationStatus conversationStatus = user.getConversations().get(this);
+    private void addNotification(User user, Message message, Conversation currentConversation){
+        ConversationStatus conversationStatus = user.getConversations().get(currentConversation);
         if(conversationStatus != null) {
             conversationStatus.addNotification();
         }
