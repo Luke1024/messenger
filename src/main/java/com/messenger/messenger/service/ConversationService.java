@@ -2,6 +2,7 @@ package com.messenger.messenger.service;
 
 import com.messenger.messenger.model.dto.*;
 import com.messenger.messenger.model.entity.*;
+import com.messenger.messenger.service.mapper.ConversationMapper;
 import com.messenger.messenger.service.mapper.MessageMapper;
 import com.messenger.messenger.service.utils.ConversationDuplicationDetector;
 import com.messenger.messenger.service.utils.MessageAcquirer;
@@ -12,13 +13,9 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ConversationService {
-
-    @Autowired
-    private MessageMapper messageMapper;
 
     @Autowired
     private ConversationDuplicationDetector duplicatorDetector;
@@ -32,6 +29,12 @@ public class ConversationService {
     @Autowired
     private SettingsService settingsService;
 
+    @Autowired
+    private MessageMapper messageMapper;
+
+    @Autowired
+    private ConversationMapper conversationMapper;
+
     private List<Conversation> conversations = new ArrayList<>();
 
     public Boolean isStatusChanged(User userRequesting){
@@ -39,7 +42,7 @@ public class ConversationService {
     }
 
     public List<ConversationStatusDto> getStatus(User userRequesting){
-        return messageAcquirer.getStatus(userRequesting);
+        return conversationMapper.mapToConversationStatusDto(userRequesting.getConversations());
     }
 
     public List<MessageDto> getNewMessages(User userRequesting, long conversationId){

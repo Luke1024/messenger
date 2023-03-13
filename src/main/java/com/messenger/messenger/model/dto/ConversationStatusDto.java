@@ -37,6 +37,7 @@ public class ConversationStatusDto {
                 "conversationId=" + conversationId +
                 ", users=" + users +
                 ", waitingMessages=" + waitingMessages +
+                ", direct=" + direct +
                 '}';
     }
 }

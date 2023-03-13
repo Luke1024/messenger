@@ -16,26 +16,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-class DataHolder {
-    User tom;
-    User bob;
-    User rob;
-
-    Conversation main;
-    Conversation empty;
-
-    public DataHolder(User tom, User bob, User rob, Conversation main, Conversation empty) {
-        this.tom = tom;
-        this.bob = bob;
-        this.rob = rob;
-        this.main = main;
-        this.empty = empty;
-    }
-}
-
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class MessageSenderTest {
+
+    class DataHolder {
+        User tom;
+        User bob;
+        User rob;
+
+        Conversation main;
+        Conversation empty;
+
+        public DataHolder(User tom, User bob, User rob, Conversation main, Conversation empty) {
+            this.tom = tom;
+            this.bob = bob;
+            this.rob = rob;
+            this.main = main;
+            this.empty = empty;
+        }
+    }
 
     @Autowired
     private MessageSender messageSender;

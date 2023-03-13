@@ -1,6 +1,5 @@
 package com.messenger.messenger.service.utils;
 
-import com.messenger.messenger.model.dto.ConversationStatusDto;
 import com.messenger.messenger.model.entity.*;
 import org.springframework.stereotype.Component;
 
@@ -20,20 +19,6 @@ public class MessageAcquirer {
             if(status.isThereSomethingNew()) return true;
         }
         return false;
-    }
-
-    public List<ConversationStatusDto> getStatus(User userRequesting){
-        return userRequesting.getConversations()
-                .entrySet().stream()
-                .map(conversationEntry -> convertToConversationStatusDto(conversationEntry.getKey(), conversationEntry.getValue()))
-                .collect(Collectors.toList());
-    }
-
-    private ConversationStatusDto convertToConversationStatusDto(Conversation conversation, ConversationStatus conversationStatus){
-        return new ConversationStatusDto(conversation.getId(),
-                conversation.getUsersInConversation().stream().map(user -> user.getDto()).collect(Collectors.toList()),
-                conversationStatus.getNotificationCount(),
-                conversation.isDirect());
     }
 
     public List<Message> getNewMessages(User userRequesting, long conversationId){
