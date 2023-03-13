@@ -54,7 +54,7 @@ public class ConversationService {
                     messageAcquirer.loadLastBatch(user, conversationId));
     }
 
-    public Optional<BatchDto> loadBatch(User userRequesting, long conversationId, long batchId){
+    public Optional<BatchDto> loadBatch(User userRequesting, long conversationId, int batchId){
         return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
                 messageAcquirer.loadBatch(userRequesting, conversationId, batchId));
     }

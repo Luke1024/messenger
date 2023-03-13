@@ -67,7 +67,7 @@ public class ConversationController {
     }
 
     @PostMapping(value = "/load/{conversationId}/{batchId}")
-    public ResponseEntity<BatchDto> getMessageBatch(long conversationId, long batchId, HttpServletRequest request){
+    public ResponseEntity<BatchDto> getMessageBatch(long conversationId, int batchId, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()) {
             Optional<BatchDto> optionalBatchDto = conversationService.loadBatch(userOptional.get(), conversationId, batchId);

@@ -39,16 +39,16 @@ public class MessageAcquirer {
     public Optional<MessageBatch> loadLastBatch(User user, long conversationId){
         Optional<Conversation> optionalConversation = findById(conversationId, getUserConversations(user));
         if(optionalConversation.isPresent()){
-            return getLastMessageBatch(user, optionalConversation.get().getMessageBatches());
+            return getLastMessageBatch(user, optionalConversation.get());
         } else {
             return Optional.empty();
         }
     }
 
-    public Optional<MessageBatch> loadBatch(User userRequesting, long conversationId, long batchId) {
+    public Optional<MessageBatch> loadBatch(User userRequesting, long conversationId, int batchId) {
         Optional<Conversation> optionalConversation = findById(conversationId, getUserConversations(userRequesting));
         if (optionalConversation.isPresent()) {
-            return getMessageBatch(userRequesting, (int) batchId, optionalConversation.get().getMessageBatches());
+            return getMessageBatch(userRequesting, batchId, optionalConversation.get());
         }
         return Optional.empty();
     }
@@ -65,9 +65,10 @@ public class MessageAcquirer {
         return Optional.empty();
     }
 
-    private Optional<MessageBatch> getMessageBatch(User user, int batchIndex, List<MessageBatch> messageBatches) {
-        ConversationStatus conversationStatus = user.getConversations().get(this);
+    private Optional<MessageBatch> getMessageBatch(User user, int batchIndex, Conversation conversation) {
+        ConversationStatus conversationStatus = user.getConversations().get(conversation);
         if(conversationStatus != null) {
+            List<MessageBatch> messageBatches = conversation.getMessageBatches();
             if (isBatchIndexInRange(batchIndex, messageBatches)) {
                 clearConversationStatus(conversationStatus);
                 return Optional.of(messageBatches.get(batchIndex));
@@ -80,10 +81,11 @@ public class MessageAcquirer {
         return batchIndex >= 0 && messageBatches.size() > batchIndex;
     }
 
-    private Optional<MessageBatch> getLastMessageBatch(User user, List<MessageBatch> messageBatches){
-        ConversationStatus conversationStatus = user.getConversations().get(this);
+    private Optional<MessageBatch> getLastMessageBatch(User user, Conversation conversation){
+        ConversationStatus conversationStatus = user.getConversations().get(conversation);
         if(conversationStatus != null){
             clearConversationStatus(conversationStatus);
+            List<MessageBatch> messageBatches = conversation.getMessageBatches();
             if( ! messageBatches.isEmpty()){
                 return Optional.of(messageBatches.get(messageBatches.size()-1));
             }

@@ -1,9 +1,6 @@
 package com.messenger.messenger.service.utils;
 
-import com.messenger.messenger.model.dto.ConversationStatusDto;
-import com.messenger.messenger.model.entity.Conversation;
-import com.messenger.messenger.model.entity.ConversationStatus;
-import com.messenger.messenger.model.entity.User;
+import com.messenger.messenger.model.entity.*;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,12 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.xml.crypto.Data;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.Assert.*;
+import java.util.Optional;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -28,12 +24,14 @@ public class MessageAcquirerTest {
         User rob;
 
         Conversation main;
+        Conversation empty;
 
-        public DataHolder(User tom, User bob, User rob, Conversation main) {
+        public DataHolder(User tom, User bob, User rob, Conversation main, Conversation empty) {
             this.tom = tom;
             this.bob = bob;
             this.rob = rob;
             this.main = main;
+            this.empty = empty;
         }
     }
 
@@ -52,6 +50,7 @@ public class MessageAcquirerTest {
         usersInMainConversation.addAll(Arrays.asList(tom, bob, rob));
 
         Conversation mainConversation = new Conversation(0, usersInMainConversation,false);
+        Conversation emptyConversation = new Conversation(1, Arrays.asList(tom, rob), true);
 
         for(User user : usersInMainConversation){
             ConversationStatus mainStatus = new ConversationStatus();
@@ -63,12 +62,13 @@ public class MessageAcquirerTest {
             emptyStatus.setNotificationCount(0);
 
             user.getConversations().put(mainConversation, mainStatus);
+            user.getConversations().put(emptyConversation, emptyStatus);
         }
-        return new DataHolder(tom,bob,rob,mainConversation);
+        return new DataHolder(tom,bob,rob,mainConversation,emptyConversation);
     }
 
     @Test
-    public void testIsStatusChanged(){
+    public void isStatusChanged(){
         DataHolder data = createData();
 
         //starting point
@@ -82,16 +82,48 @@ public class MessageAcquirerTest {
     }
 
     @Test
-    public void getStatusDtoList(){
+    public void getNewMessages(){
         DataHolder data = createData();
 
-        List<ConversationStatusDto> conversationStatusDtos = messageAcquirer.getStatusDtoList(data.tom);
+        //should be no messages
+        Assert.assertTrue(messageAcquirer.getNewMessages(data.tom, 0).size()==0);
 
+        //sending message to "empty" conversation
+        data.tom.getConversations().get(data.empty).getWaitingMessages().add(new Message(
+                "Hello, hello.", LocalDateTime.now(), data.rob, data.empty));
 
-        Assert.assertTrue(conversationStatusDtos.size()==1);
+        Assert.assertTrue(messageAcquirer.getNewMessages(data.tom,0).size()==0);
+        Assert.assertTrue(messageAcquirer.getNewMessages(data.tom,1).size()==1);
+    }
 
-        String shouldBeStringRepresentation = "";
-        Assert.assertEquals(shouldBeStringRepresentation,
-                conversationStatusDtos.get(0).toString());
+    @Test
+    public void loadLastBatch(){
+        DataHolder data = createData();
+
+        MessageBatch messageBatch1 = new MessageBatch(0);
+        MessageBatch messageBatch2 = new MessageBatch(1);
+
+        Assert.assertTrue(messageAcquirer.loadLastBatch(data.tom,0).isEmpty());
+
+        data.main.getMessageBatches().addAll(Arrays.asList(messageBatch1, messageBatch2));
+
+        Optional<MessageBatch> messageBatchOptional = messageAcquirer.loadLastBatch(data.tom,0);
+
+        Assert.assertTrue(messageBatchOptional.get().getId()==1);
+    }
+
+    @Test
+    public void loadBatch(){
+        DataHolder data = createData();
+
+        MessageBatch messageBatch1 = new MessageBatch(0);
+        MessageBatch messageBatch2 = new MessageBatch(1);
+
+        Assert.assertTrue(messageAcquirer.loadLastBatch(data.tom,0).isEmpty());
+
+        data.main.getMessageBatches().addAll(Arrays.asList(messageBatch1, messageBatch2));
+
+        Assert.assertTrue(messageAcquirer.loadBatch(data.tom,0,0).get().getId()==0);
+        Assert.assertTrue(messageAcquirer.loadBatch(data.tom,0,1).get().getId()==1);
     }
 }
