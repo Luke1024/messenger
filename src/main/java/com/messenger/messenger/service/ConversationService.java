@@ -4,6 +4,7 @@ import com.messenger.messenger.model.dto.*;
 import com.messenger.messenger.model.entity.*;
 import com.messenger.messenger.service.mapper.ConversationMapper;
 import com.messenger.messenger.service.mapper.MessageMapper;
+import com.messenger.messenger.service.utils.ConversationAdder;
 import com.messenger.messenger.service.utils.ConversationDuplicationDetector;
 import com.messenger.messenger.service.utils.MessageAcquirer;
 import com.messenger.messenger.service.utils.MessageSender;
@@ -16,9 +17,6 @@ import java.util.Optional;
 
 @Service
 public class ConversationService {
-
-    @Autowired
-    private ConversationDuplicationDetector duplicatorDetector;
 
     @Autowired
     private MessageAcquirer messageAcquirer;
@@ -34,6 +32,9 @@ public class ConversationService {
 
     @Autowired
     private ConversationMapper conversationMapper;
+
+    @Autowired
+    private ConversationAdder conversationAdder;
 
     private List<Conversation> conversations = new ArrayList<>();
 
@@ -63,39 +64,8 @@ public class ConversationService {
         return messageSender.send(userRequesting, sendMessageDto);
     }
 
-    public boolean addConversation(User userRequesting, List<User> usersForConversationCreation){
-        return addConversation(usersForConversationCreation, userRequesting).isPresent();
-    }
-
-    public Optional<Long> addConversation(List<User> usersForConversationCreation, User userCreating){
-        usersForConversationCreation.add(userCreating);
-        boolean directConversationBetweenUsers = false;
-        if(usersForConversationCreation.size()==2) directConversationBetweenUsers = true;
-        if(usersForConversationCreation.size() != 1){
-            if( ! isConversationDuplicated(usersForConversationCreation)) {
-                if(usersForConversationCreation.size() != 1) {
-                    Conversation newConversation = new Conversation(generateId(), usersForConversationCreation, directConversationBetweenUsers);
-                    propagateConversationToUsers(newConversation);
-                    conversations.add(newConversation);
-                    return Optional.of(newConversation.getId());
-                }
-            }
-        }
-        return Optional.empty();
-    }
-
-    private boolean isConversationDuplicated(List<User> usersForConversationCreation){
-        return duplicatorDetector.isConversationWithTheSameUserSquadAlreadyExist(usersForConversationCreation, conversations);
-    }
-
-    private void propagateConversationToUsers(Conversation newConversation){
-        newConversation.getUsersInConversation().stream()
-                .forEach(user -> user.getConversations().put(newConversation, new ConversationStatus()));
-    }
-
-    private long generateId(){
-        if(conversations.isEmpty()) return 0;
-        else return conversations.get(conversations.size()-1).getId() + 1;
+    public boolean addConversation(User userCreating, List<User> usersForConversationCreation){
+        return conversationAdder.addConversation(userCreating, usersForConversationCreation, conversations);
     }
 
     public Optional<Conversation> findById(long id){

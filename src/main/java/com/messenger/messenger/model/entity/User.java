@@ -4,6 +4,7 @@ import com.messenger.messenger.model.dto.UserDto;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class User {
     private long id;
@@ -44,5 +45,16 @@ public class User {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id &&
+                name.equals(user.name) &&
+                password.equals(user.password) &&
+                identityKey.equals(user.identityKey);
     }
 }
