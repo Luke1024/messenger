@@ -1,6 +1,5 @@
 package com.messenger.messenger.service.utils;
 
-import com.messenger.messenger.model.dto.MessageDto;
 import com.messenger.messenger.model.dto.SendMessageDto;
 import com.messenger.messenger.model.entity.Conversation;
 import com.messenger.messenger.model.entity.ConversationStatus;
