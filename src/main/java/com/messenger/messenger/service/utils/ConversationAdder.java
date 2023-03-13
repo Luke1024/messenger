@@ -6,6 +6,7 @@ import com.messenger.messenger.model.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -42,8 +43,9 @@ public class ConversationAdder {
     }
 
     private boolean isAllUsersUnique(List<User> usersForConversationCreation){
-        Set<User> usersReduced = (Set<User>) usersForConversationCreation;
-        return usersForConversationCreation.size() == usersReduced.size();
+        Set<User> uniqueUsers = new HashSet<>();
+        uniqueUsers.addAll(usersForConversationCreation);
+        return usersForConversationCreation.size() == uniqueUsers.size();
     }
 
     private boolean checkIfDirectConversationBetweenUsers(List<User> usersForConversationCreation){

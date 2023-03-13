@@ -1,7 +1,5 @@
 package com.messenger.messenger.model.entity;
 
-import com.messenger.messenger.service.SettingsService;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +8,6 @@ public class Conversation {
     private List<User> usersInConversation;
     private boolean direct;
     private List<MessageBatch> messageBatches = new ArrayList<>();
-    private SettingsService settingsService = new SettingsService();
 
     public Conversation(long id, List<User> users, boolean direct) {
         this.id = id;
