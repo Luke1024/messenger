@@ -3,7 +3,10 @@ package com.messenger.messenger.service;
 import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.User;
+import com.messenger.messenger.service.utils.Settings;
+import com.messenger.messenger.service.utils.TokenGenerator;
 import com.messenger.messenger.service.utils.UserFinder;
+import com.messenger.messenger.service.utils.temp.DataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +22,20 @@ import java.util.Optional;
 public class UserService {
 
     @Autowired
-    private TokenService tokenService;
+    private TokenGenerator tokenGenerator;
 
     @Autowired
-    private SettingsService settingsService;
+    private Settings settings;
 
     @Autowired
     private UserFinder userFinder;
 
+    @Autowired
+    private DataGenerator dataGenerator;
+
     private Logger logger = LoggerFactory.getLogger(UserService.class);
 
-    private List<User> users = new ArrayList<>();
+    public List<User> users = new ArrayList<>();
 
     public List<UserDto> findUsersByNameToDto(String userName){
         return userFinder.findUsersByNameToDto(userName, users);
@@ -46,6 +52,8 @@ public class UserService {
             User newUser = generateNewUserFromDataDto(userDataDto);
             newUser.setId(generateId());
             users.add(newUser);
+            //this is temporary for development only
+            dataGenerator.generateDataForUser(newUser, this);
             return true;
         } else return false;
     }
@@ -77,7 +85,7 @@ public class UserService {
     }
 
     private String generateIdentityKey(){
-        return tokenService.generate();
+        return tokenGenerator.generate();
     }
 
     private boolean isPasswordValid(String passwordReal, String passwordGiven){
@@ -91,7 +99,7 @@ public class UserService {
     }
 
     private String cookieGenerator(String identityKey){
-        return settingsService.authKey + "=" + identityKey + "; SameSite=Strict; Path=/; Max-Age=15000000; HttpOnly;";
+        return settings.authKey + "=" + identityKey + "; SameSite=Strict; Path=/; Max-Age=15000000; HttpOnly;";
     }
 
     private long generateId(){

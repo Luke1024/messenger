@@ -4,6 +4,7 @@ import com.messenger.messenger.model.dto.ConversationStatusDto;
 import com.messenger.messenger.model.dto.SendMessageDto;
 import com.messenger.messenger.model.entity.Conversation;
 import com.messenger.messenger.model.entity.User;
+import com.messenger.messenger.service.utils.Settings;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +30,7 @@ public class ConversationServiceTest {
     private UserService userService;
 
     @Autowired
-    private SettingsService settingsService;
+    private Settings settings;
 
     User newUser1 = new User("TestUser1", "password1", "key");
     User newUser2 = new User("TestUser2", "password2", "key2");

@@ -5,9 +5,9 @@ import com.messenger.messenger.model.entity.*;
 import com.messenger.messenger.service.mapper.ConversationMapper;
 import com.messenger.messenger.service.mapper.MessageMapper;
 import com.messenger.messenger.service.utils.ConversationAdder;
-import com.messenger.messenger.service.utils.ConversationDuplicationDetector;
 import com.messenger.messenger.service.utils.MessageAcquirer;
 import com.messenger.messenger.service.utils.MessageSender;
+import com.messenger.messenger.service.utils.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class ConversationService {
     private MessageSender messageSender;
 
     @Autowired
-    private SettingsService settingsService;
+    private Settings settings;
 
     @Autowired
     private MessageMapper messageMapper;
@@ -36,7 +36,7 @@ public class ConversationService {
     @Autowired
     private ConversationAdder conversationAdder;
 
-    private List<Conversation> conversations = new ArrayList<>();
+    public List<Conversation> conversations = new ArrayList<>();
 
     public Boolean isStatusChanged(User userRequesting){
         return messageAcquirer.isStatusChanged(userRequesting);

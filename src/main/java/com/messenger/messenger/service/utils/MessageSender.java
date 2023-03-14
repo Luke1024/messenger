@@ -2,7 +2,6 @@ package com.messenger.messenger.service.utils;
 
 import com.messenger.messenger.model.dto.SendMessageDto;
 import com.messenger.messenger.model.entity.*;
-import com.messenger.messenger.service.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
 public class MessageSender {
 
     @Autowired
-    private SettingsService settingsService;
+    private Settings settings;
 
     public boolean send(User userRequesting, SendMessageDto sendMessageDto){
         Optional<Conversation> optionalConversation = findById(sendMessageDto.getConversationId(),
@@ -58,7 +57,7 @@ public class MessageSender {
         }
         if( ! messageBatches.isEmpty()){
             MessageBatch lastMessageBatch = messageBatches.get(messageBatches.size()-1);
-            if(lastMessageBatch.getMessages().size() > settingsService.messageCountInBatch-1){
+            if(lastMessageBatch.getMessages().size() > settings.messageCountInBatch-1){
                 MessageBatch newMessageBatch = new MessageBatch(generateBatchId(messageBatches));
                 messageBatches.add(newMessageBatch);
                 return newMessageBatch;

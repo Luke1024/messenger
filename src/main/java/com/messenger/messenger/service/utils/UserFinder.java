@@ -2,7 +2,6 @@ package com.messenger.messenger.service.utils;
 
 import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.User;
-import com.messenger.messenger.service.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +16,7 @@ import java.util.stream.Collectors;
 public class UserFinder {
 
     @Autowired
-    private SettingsService settingsService;
+    private Settings settings;
 
     public Optional<User> findUserByHttpRequest(HttpServletRequest request, List<User> users){
         Optional<String> optionalIdentityKey = getIdentityKey(request);
@@ -57,7 +56,7 @@ public class UserFinder {
         if(request.getCookies() != null) {
             Cookie[] cookies = request.getCookies();
             for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(settingsService.authKey)) {
+                if (cookie.getName().equals(settings.authKey)) {
                     return Optional.of(cookie.getValue());
                 }
             }

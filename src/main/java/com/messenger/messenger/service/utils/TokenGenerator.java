@@ -1,4 +1,4 @@
-package com.messenger.messenger.service;
+package com.messenger.messenger.service.utils;
 
 
 import org.springframework.stereotype.Service;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import java.security.SecureRandom;
 
 @Service
-public class TokenService {
+public class TokenGenerator {
 
     private SecureRandom random = new SecureRandom();
     int tokenLenght = 16;

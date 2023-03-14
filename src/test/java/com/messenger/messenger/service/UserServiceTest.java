@@ -2,6 +2,7 @@ package com.messenger.messenger.service;
 
 import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.entity.User;
+import com.messenger.messenger.service.utils.Settings;
 import com.messenger.messenger.service.utils.UserFinder;
 import org.junit.Assert;
 import org.junit.Test;
@@ -25,7 +26,7 @@ public class UserServiceTest {
     private UserService userService;
 
     @Autowired
-    private SettingsService settingsService;
+    private Settings settings;
 
     @Autowired
     private UserFinder userFinder;
@@ -41,7 +42,7 @@ public class UserServiceTest {
         userList.add(new User("newUser", "newPassword", "identityKey"));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
-        request.setCookies(new Cookie(settingsService.authKey,"identityKey"));
+        request.setCookies(new Cookie(settings.authKey,"identityKey"));
 
         Assert.assertTrue(userService.findUserByHttpRequest(request).isPresent());
 
@@ -49,7 +50,7 @@ public class UserServiceTest {
     }
 
     private String cookieGenerator(String identityKey){
-        return settingsService.authKey + "=" + identityKey + "; Max-Age=15000000; Secure; HttpOnly; SameSite=None";
+        return settings.authKey + "=" + identityKey + "; Max-Age=15000000; Secure; HttpOnly; SameSite=None";
     }
 
     @Test
@@ -82,7 +83,7 @@ public class UserServiceTest {
         Assert.assertTrue(userService.register(newUserDataDto));
         Assert.assertTrue(userService.loginUser(newUserDataDto, response));
 
-        Assert.assertTrue(response.getCookie(settingsService.authKey) != null);
+        Assert.assertTrue(response.getCookie(settings.authKey) != null);
 
         Field userList = userService.getClass().getDeclaredField("users");
         userList.setAccessible(true);
