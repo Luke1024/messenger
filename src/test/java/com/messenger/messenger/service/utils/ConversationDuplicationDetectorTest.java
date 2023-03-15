@@ -29,6 +29,7 @@ public class ConversationDuplicationDetectorTest {
         User user2 = new User("Rob", "", "");
         User user3 = new User("Bob", "", "");
         User user4 = new User("Tim", "", "");
+        User user5 = new User("master", "flamaster", "");
 
         Conversation conversationInDatabase1 =
                 new Conversation(0, Arrays.asList(user1, user2, user3) ,false);
@@ -55,5 +56,10 @@ public class ConversationDuplicationDetectorTest {
         Assert.assertFalse(conversationDuplicationDetector.isConversationWithTheSameUserSquadAlreadyExist(
                 Arrays.asList(user1, user2, user4), database2)
         );
+
+        //conversation with users in conversation already but without some
+
+        Assert.assertFalse(conversationDuplicationDetector.isConversationWithTheSameUserSquadAlreadyExist(
+                Arrays.asList(user1, user2),database2));
     }
 }

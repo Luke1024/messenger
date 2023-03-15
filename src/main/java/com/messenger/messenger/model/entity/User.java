@@ -57,4 +57,14 @@ public class User {
                 password.equals(user.password) &&
                 identityKey.equals(user.identityKey);
     }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", password='" + password + '\'' +
+                ", identityKey='" + identityKey + '\'' +
+                '}';
+    }
 }

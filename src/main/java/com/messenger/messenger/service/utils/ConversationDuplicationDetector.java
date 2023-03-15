@@ -12,10 +12,9 @@ public class ConversationDuplicationDetector {
 
     public boolean isConversationWithTheSameUserSquadAlreadyExist(
             List<User> usersForConversationCreation, List<Conversation> conversations){
-        List<User> clonedUsersForConversationCreation = new ArrayList<>();
-        clonedUsersForConversationCreation.addAll(usersForConversationCreation);
+
         for(Conversation conversation : conversations){
-            if(checkIfSquadTheSame(conversation, clonedUsersForConversationCreation)){
+            if(checkIfSquadTheSame(conversation, usersForConversationCreation)){
                 return true;
             }
         }
@@ -24,11 +23,13 @@ public class ConversationDuplicationDetector {
 
     private boolean checkIfSquadTheSame(
             Conversation conversation, List<User> usersForConversationCreation){
-        List<User> usersAlreadyInTheConversation = conversation.getUsersInConversation();
-        for(User userInConversation : usersAlreadyInTheConversation){
-            usersForConversationCreation.remove(userInConversation);
+        List<User> clonedUsersAlreadyInConversation = new ArrayList<>();
+        clonedUsersAlreadyInConversation.addAll(conversation.getUsersInConversation());
+
+        for(User userForConversationCreation : usersForConversationCreation){
+            clonedUsersAlreadyInConversation.remove(userForConversationCreation);
         }
-        if(usersForConversationCreation.isEmpty()){
+        if(clonedUsersAlreadyInConversation.isEmpty()){
             return true;
         } else {
             return false;

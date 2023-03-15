@@ -3,42 +3,60 @@ package com.messenger.messenger.service.utils;
 import com.messenger.messenger.model.entity.Conversation;
 import com.messenger.messenger.model.entity.ConversationStatus;
 import com.messenger.messenger.model.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 public class ConversationAdder {
 
     @Autowired
     private ConversationDuplicationDetector duplicatorDetector;
+    private Logger logger = LoggerFactory.getLogger(ConversationAdder.class);
 
     public boolean addConversation(
             User userCreating,
             List<User> usersForConversationCreation,
             List<Conversation> conversations){
 
-        if(usersForConversationCreation.isEmpty()) return false;
+        List<User> usersForConversationCreationCloned = new ArrayList<>();
+        usersForConversationCreationCloned.addAll(usersForConversationCreation);
 
-        usersForConversationCreation.add(userCreating);
+        if(usersForConversationCreationCloned.isEmpty()){
+            logger.info("Conversation creation error: There is no users for conversation creation.");
+            return false;
+        }
 
-        if( ! isAllUsersUnique(usersForConversationCreation)) return false;
+        usersForConversationCreationCloned.add(userCreating);
+        if( ! isAllUsersUnique(usersForConversationCreationCloned)){
+            logger.info("Conversation creation error: Users are not unique.");
+            return false;
+        }
 
-        boolean direct = checkIfDirectConversationBetweenUsers(usersForConversationCreation);
+        boolean direct = checkIfDirectConversationBetweenUsers(usersForConversationCreationCloned);
 
-        if(isConversationDuplicated(usersForConversationCreation, conversations)) return false;
+        if(isConversationDuplicated(usersForConversationCreationCloned, conversations)){
+            logger.info("Conversation creation error: Conversation with user composition already exists.");
+            return false;
+        }
 
         Conversation newConversation =
                 new Conversation(
                         generateId(conversations),
-                        usersForConversationCreation,
+                        usersForConversationCreationCloned,
                         direct);
 
         propagateConversationToUsers(newConversation,newConversation.getUsersInConversation());
         conversations.add(newConversation);
+        logger.info("Succesfully added conversation : " + newConversation.getUsersInConversation()
+                .stream().map(user -> user.toString()).collect(Collectors.joining(", ")));
         return true;
     }
 
