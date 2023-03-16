@@ -43,7 +43,7 @@ public class ConversationService {
     }
 
     public List<ConversationStatusDto> getStatus(User userRequesting){
-        return conversationMapper.mapToConversationStatusDto(messageAcquirer.getUserConversationStatus(userRequesting));
+        return conversationMapper.mapToConversationStatusDto(userRequesting,messageAcquirer.getUserConversationStatus(userRequesting));
     }
 
     public List<MessageDto> getNewMessages(User userRequesting, long conversationId){

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:4200/",allowCredentials = "true")
 @RestController
 @RequestMapping(value = "/message")
 public class ConversationController {
