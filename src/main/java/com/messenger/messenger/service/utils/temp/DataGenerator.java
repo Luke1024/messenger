@@ -27,23 +27,6 @@ public class DataGenerator {
 
     private Logger logger = LoggerFactory.getLogger(DataGenerator.class);
 
-    class DataHolder {
-        User tom;
-        User bob;
-        User rob;
-
-        Conversation main;
-        Conversation empty;
-
-        public DataHolder(User tom, User bob, User rob, Conversation main, Conversation empty) {
-            this.tom = tom;
-            this.bob = bob;
-            this.rob = rob;
-            this.main = main;
-            this.empty = empty;
-        }
-    }
-
     public void generateDataForUser(User newUser, UserService userService){
         registerAdditionalUsers(userService);
         List<User> additionalUsers = userService.users.stream()

@@ -53,7 +53,7 @@ public class UserService {
             newUser.setId(generateId());
             users.add(newUser);
             //this is temporary for development only
-            //dataGenerator.generateDataForUser(newUser, this);
+            dataGenerator.generateDataForUser(newUser, this);
             return true;
         } else return false;
     }

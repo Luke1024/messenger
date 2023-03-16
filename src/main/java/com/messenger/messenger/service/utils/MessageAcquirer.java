@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,17 @@ public class MessageAcquirer {
             if(status.isThereSomethingNew()) return true;
         }
         return false;
+    }
+
+    public Map<Conversation, ConversationStatus> getUserConversationStatus(User userRequesting){
+        List<ConversationStatus> conversationStatusList =
+                userRequesting.getConversations().entrySet().stream()
+                .map(entry -> entry.getValue()).collect(Collectors.toList());
+
+        for(ConversationStatus conversationStatus : conversationStatusList){
+            conversationStatus.setSomethingChanged(false);
+        }
+        return userRequesting.getConversations();
     }
 
     public List<Message> getNewMessages(User userRequesting, long conversationId){
