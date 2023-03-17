@@ -27,7 +27,7 @@ public class ConversationMapper {
             ConversationStatus conversationStatus){
         return new ConversationStatusDto(conversation.getId(),
                 conversation.getUsersInConversation().stream().filter(user -> user != userRequesting)
-                        .map(user -> user.getDto()).collect(Collectors.toList()),
+                        .map(user -> user.getName()).collect(Collectors.joining(", ")),
                 conversationStatus.getNotificationCount(),
                 conversation.isDirect());
     }

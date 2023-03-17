@@ -1,14 +1,12 @@
 package com.messenger.messenger.model.dto;
 
-import java.util.List;
-
 public class ConversationStatusDto {
     private long conversationId;
-    private List<UserDto> users;
+    private String users;
     private int waitingMessages;
     private boolean direct;
 
-    public ConversationStatusDto(long conversationId, List<UserDto> users, int waitingMessages, boolean direct) {
+    public ConversationStatusDto(long conversationId, String users, int waitingMessages, boolean direct) {
         this.conversationId = conversationId;
         this.users = users;
         this.waitingMessages = waitingMessages;
@@ -19,7 +17,7 @@ public class ConversationStatusDto {
         return conversationId;
     }
 
-    public List<UserDto> getUsers() {
+    public String getUsers() {
         return users;
     }
 

@@ -5,12 +5,12 @@ import java.time.LocalDateTime;
 public class MessageDto {
     private long conversationId;
     private long batchId;
-    private LocalDateTime send;
+    private String send;
     private String content;
 
     public MessageDto() { }
 
-    public MessageDto(long conversationId, long batchId, LocalDateTime send, String content) {
+    public MessageDto(long conversationId, long batchId, String send, String content) {
         this.conversationId = conversationId;
         this.batchId = batchId;
         this.send = send;
@@ -25,7 +25,7 @@ public class MessageDto {
         return batchId;
     }
 
-    public LocalDateTime getSend() {
+    public String getSend() {
         return send;
     }
 

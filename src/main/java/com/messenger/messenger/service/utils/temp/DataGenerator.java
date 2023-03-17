@@ -56,10 +56,8 @@ public class DataGenerator {
 
     private void populateConversationWithMessages(User newUser, List<User> additionalUsers){
         for(Conversation conversation : conversationService.conversations){
-            for(int i=0; i<5; i++) {
-                populateConversation(conversation, additionalUsers);
-                userResponding(conversation, newUser);
-            }
+            populateConversation(conversation, additionalUsers);
+            userResponding(conversation, newUser);
         }
     }
 
@@ -72,9 +70,10 @@ public class DataGenerator {
     }
 
     private void userResponding(Conversation conversation, User newUser){
-        conversationService.send(newUser, new SendMessageDto(conversation.getId(), shortMessage));
-        conversationService.send(newUser, new SendMessageDto(conversation.getId(), midMessage));
-        conversationService.send(newUser, new SendMessageDto(conversation.getId(), longMessage));
+        String originalMessage = "I'm original user. ";
+        conversationService.send(newUser, new SendMessageDto(conversation.getId(), originalMessage + shortMessage));
+        conversationService.send(newUser, new SendMessageDto(conversation.getId(), originalMessage + midMessage));
+        conversationService.send(newUser, new SendMessageDto(conversation.getId(), originalMessage + longMessage));
     }
 
     private String shortMessage = "Lorem ipsum dolor sit amet";

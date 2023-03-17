@@ -6,6 +6,8 @@ import com.messenger.messenger.model.entity.Message;
 import com.messenger.messenger.model.entity.MessageBatch;
 import org.springframework.stereotype.Service;
 
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,7 +20,8 @@ public class MessageMapper {
     }
 
     private MessageDto mapToDto(Message message){
-        return new MessageDto(message.getConversation().getId(), message.getMessageBatch().getId(), message.getSend(), message.getContent());
+        return new MessageDto(message.getConversation().getId(), message.getMessageBatch().getId(),
+                message.getSend().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)), message.getContent());
     }
 
     public Optional<BatchDto> mapToBatchDtoOptionalFromMessageBatchOptional(Optional<MessageBatch> messageBatch){

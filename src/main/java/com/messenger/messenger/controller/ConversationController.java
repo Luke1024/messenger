@@ -55,7 +55,7 @@ public class ConversationController {
     }
 
     @GetMapping(value = "loadLast/{conversationId}")
-    public ResponseEntity<BatchDto> getLastMessageBatch(long conversationId, HttpServletRequest request){
+    public ResponseEntity<BatchDto> getLastMessageBatch(@PathVariable long conversationId, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
             Optional<BatchDto> optionalBatchDto = conversationService.loadLastBatch(userOptional.get(), conversationId);
