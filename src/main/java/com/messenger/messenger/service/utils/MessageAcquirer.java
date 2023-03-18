@@ -108,6 +108,5 @@ public class MessageAcquirer {
     private void clearConversationStatus(ConversationStatus conversationStatus){
         conversationStatus.getWaitingMessages().clear();
         conversationStatus.setNotificationCount(0);
-        conversationStatus.setSomethingChanged(false);
     }
 }
