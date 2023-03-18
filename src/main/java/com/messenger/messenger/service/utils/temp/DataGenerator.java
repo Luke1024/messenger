@@ -36,7 +36,7 @@ public class DataGenerator {
             logger.info("Conversations added");
         }
         logger.info("Conversations created total: " + conversationService.conversations.size());
-        populateConversationWithMessages(newUser, additionalUsers);
+        populateConversationWithMessages(newUser);
     }
 
     private void registerAdditionalUsers(UserService userService){
@@ -54,26 +54,18 @@ public class DataGenerator {
         return true;
     }
 
-    private void populateConversationWithMessages(User newUser, List<User> additionalUsers){
+    private void populateConversationWithMessages(User newUser){
         for(Conversation conversation : conversationService.conversations){
-            populateConversation(conversation, additionalUsers);
-            userResponding(conversation, newUser);
+            populateConversation(conversation);
         }
     }
 
-    private void populateConversation(Conversation conversation, List<User> additionalUsers){
-        for(User additionalUser : additionalUsers){
-            conversationService.send(additionalUser, new SendMessageDto(conversation.getId(),shortMessage));
-            conversationService.send(additionalUser, new SendMessageDto(conversation.getId(),midMessage));
-            conversationService.send(additionalUser, new SendMessageDto(conversation.getId(),longMessage));
+    private void populateConversation(Conversation conversation){
+        for(User userInConversation : conversation.getUsersInConversation()){
+            conversationService.send(userInConversation, new SendMessageDto(conversation.getId(),shortMessage));
+            conversationService.send(userInConversation, new SendMessageDto(conversation.getId(),midMessage));
+            conversationService.send(userInConversation, new SendMessageDto(conversation.getId(),longMessage));
         }
-    }
-
-    private void userResponding(Conversation conversation, User newUser){
-        String originalMessage = "I'm original user. ";
-        conversationService.send(newUser, new SendMessageDto(conversation.getId(), originalMessage + shortMessage));
-        conversationService.send(newUser, new SendMessageDto(conversation.getId(), originalMessage + midMessage));
-        conversationService.send(newUser, new SendMessageDto(conversation.getId(), originalMessage + longMessage));
     }
 
     private String shortMessage = "Lorem ipsum dolor sit amet";

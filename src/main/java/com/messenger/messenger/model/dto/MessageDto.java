@@ -7,14 +7,16 @@ public class MessageDto {
     private long batchId;
     private String send;
     private String content;
+    private boolean byUserReceiving;
 
     public MessageDto() { }
 
-    public MessageDto(long conversationId, long batchId, String send, String content) {
+    public MessageDto(long conversationId, long batchId, String send, String content, boolean byUserReceiving) {
         this.conversationId = conversationId;
         this.batchId = batchId;
         this.send = send;
         this.content = content;
+        this.byUserReceiving = byUserReceiving;
     }
 
     public long getConversationId() {
@@ -31,5 +33,9 @@ public class MessageDto {
 
     public String getContent() {
         return content;
+    }
+
+    public boolean isByUserReceiving() {
+        return byUserReceiving;
     }
 }

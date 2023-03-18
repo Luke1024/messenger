@@ -47,17 +47,17 @@ public class ConversationService {
     }
 
     public List<MessageDto> getNewMessages(User userRequesting, long conversationId){
-        return messageMapper.mapToDtoList(messageAcquirer.getNewMessages(userRequesting, conversationId));
+        return messageMapper.mapToDtoList(messageAcquirer.getNewMessages(userRequesting, conversationId), userRequesting);
     }
 
-    public Optional<BatchDto> loadLastBatch(User user, long conversationId) {
+    public Optional<BatchDto> loadLastBatch(User userRequesting, long conversationId) {
         return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
-                    messageAcquirer.loadLastBatch(user, conversationId));
+                    messageAcquirer.loadLastBatch(userRequesting, conversationId), userRequesting);
     }
 
     public Optional<BatchDto> loadBatch(User userRequesting, long conversationId, int batchId){
         return messageMapper.mapToBatchDtoOptionalFromMessageBatchOptional(
-                messageAcquirer.loadBatch(userRequesting, conversationId, batchId));
+                messageAcquirer.loadBatch(userRequesting, conversationId, batchId), userRequesting);
     }
 
     public boolean send(User userRequesting, SendMessageDto sendMessageDto){
