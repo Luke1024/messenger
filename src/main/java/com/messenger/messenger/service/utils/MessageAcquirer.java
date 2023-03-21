@@ -97,6 +97,7 @@ public class MessageAcquirer {
         ConversationStatus conversationStatus = user.getConversations().get(conversation);
         if(conversationStatus != null){
             clearConversationStatus(conversationStatus);
+            conversationStatus.setSomethingChanged(true);
             List<MessageBatch> messageBatches = conversation.getMessageBatches();
             if( ! messageBatches.isEmpty()){
                 return Optional.of(messageBatches.get(messageBatches.size()-1));
@@ -108,5 +109,6 @@ public class MessageAcquirer {
     private void clearConversationStatus(ConversationStatus conversationStatus){
         conversationStatus.getWaitingMessages().clear();
         conversationStatus.setNotificationCount(0);
+        conversationStatus.setSomethingChanged(false);
     }
 }

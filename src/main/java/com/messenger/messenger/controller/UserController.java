@@ -55,4 +55,13 @@ public class UserController {
             return ResponseEntity.ok(new ArrayList<>());
         }
     }
+
+    @GetMapping(value = "/allUsers")
+    public ResponseEntity<List<UserDto>> allUsers(HttpServletRequest request){
+        Optional<User> userOptional = userService.findUserByHttpRequest(request);
+        if(userOptional.isPresent()){
+            return ResponseEntity.ok(userService.getAllUsersBelongingToRequestingUser(userOptional.get()));
+        }
+        return ResponseEntity.ok(new ArrayList<>());
+    }
 }

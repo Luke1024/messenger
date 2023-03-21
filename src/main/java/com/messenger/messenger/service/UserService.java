@@ -15,8 +15,10 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -71,6 +73,16 @@ public class UserService {
 
     public List<User> findUsersByDto(List<UserDto> userDtos){
         return userFinder.findUsersByDto(userDtos, users);
+    }
+
+    public List<UserDto> getAllUsersBelongingToRequestingUser(User userRequesting){
+        List<User> usersBelongingToUser = userRequesting.getConversations()
+                .entrySet().stream()
+                .map(entry -> entry.getKey())
+                .filter(conversation -> conversation.isDirect())
+                .map(conversation -> conversation.getUsersInConversation())
+                .flatMap(Collection::stream).collect(Collectors.toList());
+        return usersBelongingToUser.stream().map(user -> user.getDto()).collect(Collectors.toList());
     }
 
     private boolean isRegistrationAllowed(UserDataDto userDataDto){

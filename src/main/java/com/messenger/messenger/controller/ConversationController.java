@@ -45,7 +45,7 @@ public class ConversationController {
     }
 
     @GetMapping(value = "/new/{conversationId}")
-    public ResponseEntity<List<MessageDto>> getNewMessages(long conversationId, HttpServletRequest request){
+    public ResponseEntity<List<MessageDto>> getNewMessages(@PathVariable long conversationId, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
             return ResponseEntity.ok(conversationService.getNewMessages(userOptional.get(), conversationId));
@@ -67,7 +67,7 @@ public class ConversationController {
     }
 
     @PostMapping(value = "/load/{conversationId}/{batchId}")
-    public ResponseEntity<BatchDto> getMessageBatch(long conversationId, int batchId, HttpServletRequest request){
+    public ResponseEntity<BatchDto> getMessageBatch(@PathVariable long conversationId, @PathVariable int batchId, HttpServletRequest request){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()) {
             Optional<BatchDto> optionalBatchDto = conversationService.loadBatch(userOptional.get(), conversationId, batchId);
