@@ -24,8 +24,9 @@ public class ConversationDuplicationDetector {
     private boolean checkIfSquadTheSame(
             Conversation conversation, List<User> usersForConversationCreation){
         List<User> clonedUsersAlreadyInConversation = new ArrayList<>();
-        clonedUsersAlreadyInConversation.addAll(conversation.getUsersInConversation());
+        if(conversation.getUsersInConversation().size() < usersForConversationCreation.size()) return false;
 
+        clonedUsersAlreadyInConversation.addAll(conversation.getUsersInConversation());
         for(User userForConversationCreation : usersForConversationCreation){
             clonedUsersAlreadyInConversation.remove(userForConversationCreation);
         }

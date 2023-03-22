@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,10 +48,12 @@ public class DataGenerator {
     }
 
     private boolean createConversationBetweenAdditionalUsersAndNewUser(User newUser, List<User> additionalUsers){
-        if( ! conversationService.addConversation(newUser, additionalUsers)) return false;
-        if( ! conversationService.addConversation(newUser, additionalUsers.subList(0,additionalUsers.size()-1))) return false;
-        if( ! conversationService.addConversation(newUser, additionalUsers.subList(0, additionalUsers.size()-2))) return false;
-        if( ! conversationService.addConversation(newUser, additionalUsers.subList(0, additionalUsers.size()-3))) return false;
+        for(int i=0; i<additionalUsers.size()-1; i++){
+            conversationService.addConversation(newUser, Arrays.asList(additionalUsers.get(i)));
+        }
+        conversationService.addConversation(newUser, additionalUsers);
+        conversationService.addConversation(newUser, additionalUsers.subList(0,additionalUsers.size()-1));
+        conversationService.addConversation(newUser, additionalUsers.subList(0, additionalUsers.size()-2));
         return true;
     }
 

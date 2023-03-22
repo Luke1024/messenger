@@ -54,8 +54,11 @@ public class UserService {
             User newUser = generateNewUserFromDataDto(userDataDto);
             newUser.setId(generateId());
             users.add(newUser);
+
             //this is temporary for development only
-            dataGenerator.generateDataForUser(newUser, this);
+            if(userDataDto.getUserName().equals("testUser")) {
+                dataGenerator.generateDataForUser(newUser, this);
+            }
             return true;
         } else return false;
     }
@@ -75,13 +78,14 @@ public class UserService {
         return userFinder.findUsersByDto(userDtos, users);
     }
 
-    public List<UserDto> getAllUsersBelongingToRequestingUser(User userRequesting){
+    public List<UserDto> getAllUsersContacts(User userRequesting){
         List<User> usersBelongingToUser = userRequesting.getConversations()
                 .entrySet().stream()
                 .map(entry -> entry.getKey())
                 .filter(conversation -> conversation.isDirect())
                 .map(conversation -> conversation.getUsersInConversation())
-                .flatMap(Collection::stream).collect(Collectors.toList());
+                .flatMap(Collection::stream)
+                .filter(user -> user != userRequesting).collect(Collectors.toList());
         return usersBelongingToUser.stream().map(user -> user.getDto()).collect(Collectors.toList());
     }
 

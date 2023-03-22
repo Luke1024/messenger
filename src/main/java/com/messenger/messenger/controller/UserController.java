@@ -60,7 +60,7 @@ public class UserController {
     public ResponseEntity<List<UserDto>> allUsers(HttpServletRequest request){
         Optional<User> userOptional = userService.findUserByHttpRequest(request);
         if(userOptional.isPresent()){
-            return ResponseEntity.ok(userService.getAllUsersBelongingToRequestingUser(userOptional.get()));
+            return ResponseEntity.ok(userService.getAllUsersContacts(userOptional.get()));
         }
         return ResponseEntity.ok(new ArrayList<>());
     }
