@@ -46,8 +46,8 @@ public class UserController {
         } else return ResponseEntity.ok(false);
     }
 
-    @PostMapping(value = "/findUser/{userName}")
-    public ResponseEntity<List<UserDto>> findUser(HttpServletRequest request, @PathVariable String userName){
+    @GetMapping(value = "/findUser/{userName}")
+    public ResponseEntity<List<UserDto>> findUser(@PathVariable String userName, HttpServletRequest request){
         Optional<User> userOptional = userService.findUserByHttpRequest(request);
         if (userOptional.isPresent()) {
             return ResponseEntity.ok(userService.findUsersByNameToDto(userName));

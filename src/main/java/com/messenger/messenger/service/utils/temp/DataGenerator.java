@@ -48,10 +48,9 @@ public class DataGenerator {
     }
 
     private boolean createConversationBetweenAdditionalUsersAndNewUser(User newUser, List<User> additionalUsers){
-        for(int i=0; i<additionalUsers.size()-1; i++){
+        for(int i=0; i<additionalUsers.size()-1; i++) {
             conversationService.addConversation(newUser, Arrays.asList(additionalUsers.get(i)));
         }
-        conversationService.addConversation(newUser, additionalUsers);
         conversationService.addConversation(newUser, additionalUsers.subList(0,additionalUsers.size()-1));
         conversationService.addConversation(newUser, additionalUsers.subList(0, additionalUsers.size()-2));
         return true;

@@ -4,6 +4,8 @@ import com.messenger.messenger.model.dto.*;
 import com.messenger.messenger.model.entity.User;
 import com.messenger.messenger.service.ConversationService;
 import com.messenger.messenger.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:4200/",allowCredentials = "true")
 @RestController
@@ -23,6 +26,8 @@ public class ConversationController {
 
     @Autowired
     private UserService userService;
+
+    private Logger logger = LoggerFactory.getLogger(ConversationController.class);
 
     @GetMapping(value = "change")
     public ResponseEntity<Boolean> isStatusNew(HttpServletRequest request){
@@ -92,7 +97,9 @@ public class ConversationController {
     public ResponseEntity<Boolean> addConversation(HttpServletRequest request, @RequestBody List<UserDto> userDtos){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
+            logger.info(userDtos.stream().map(user -> user.getUserName()).collect(Collectors.joining(", ")));
             List<User> userFound = userService.findUsersByDto(userDtos);
+            logger.info(userFound.stream().map(user -> user.getName()).collect(Collectors.joining(", ")));
             return ResponseEntity.ok(conversationService.addConversation(userOptional.get(), userFound));
         } else {
             return ResponseEntity.ok(false);

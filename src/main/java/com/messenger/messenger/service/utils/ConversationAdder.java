@@ -61,8 +61,10 @@ public class ConversationAdder {
     }
 
     private boolean isAllUsersUnique(List<User> usersForConversationCreation){
+        logger.info(usersForConversationCreation.stream().map(user -> user.getName()).collect(Collectors.joining(", ")));
         Set<User> uniqueUsers = new HashSet<>();
         uniqueUsers.addAll(usersForConversationCreation);
+        logger.info(uniqueUsers.stream().map(user -> user.getName()).collect(Collectors.joining(", ")));
         return usersForConversationCreation.size() == uniqueUsers.size();
     }
 

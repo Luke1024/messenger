@@ -2,6 +2,8 @@ package com.messenger.messenger.service.utils;
 
 import com.messenger.messenger.model.entity.Conversation;
 import com.messenger.messenger.model.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;

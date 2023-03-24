@@ -2,6 +2,8 @@ package com.messenger.messenger.service.utils;
 
 import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +19,8 @@ public class UserFinder {
 
     @Autowired
     private Settings settings;
+
+    private Logger logger = LoggerFactory.getLogger(UserFinder.class);
 
     public Optional<User> findUserByHttpRequest(HttpServletRequest request, List<User> users){
         Optional<String> optionalIdentityKey = getIdentityKey(request);
@@ -44,7 +48,7 @@ public class UserFinder {
                 }
             }
         }
-        return users;
+        return usersFound;
     }
 
     public List<UserDto> findUsersByNameToDto(String userName, List<User> users){
@@ -83,10 +87,10 @@ public class UserFinder {
 
         List<User> usersCompatible = new ArrayList<>();
         for(User user : users){
-            if(user.getName().contains(userName)) {
+            if(user.getName().toLowerCase().contains(userName.toLowerCase())) {
                 usersCompatible.add(user);
             }
         }
-        return users;
+        return usersCompatible;
     }
 }
