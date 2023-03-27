@@ -1,7 +1,9 @@
-package com.messenger.messenger.service.utils;
+package com.messenger.messenger.service.utils.userfinder;
 
 import com.messenger.messenger.model.dto.UserDto;
+import com.messenger.messenger.model.entity.Conversation;
 import com.messenger.messenger.model.entity.User;
+import com.messenger.messenger.service.utils.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +22,8 @@ public class UserFinder {
 
     @Autowired
     private Settings settings;
+
+    private UnknownUserFinder unknownfinder = new UnknownUserFinder();
 
     private Logger logger = LoggerFactory.getLogger(UserFinder.class);
 
@@ -51,9 +56,8 @@ public class UserFinder {
         return usersFound;
     }
 
-    public List<UserDto> findUsersByNameToDto(String userName, List<User> users){
-        List<User> usersFound = findUsersByStringContainedInTheName(userName, users);
-        return usersFound.stream().map(user -> user.getDto()).collect(Collectors.toList());
+    public List<User> findUsersByNameExcludingUsersAlreadyInDirectConversation(String userName, User userRequesting, List<User> users){
+        return unknownfinder.findUsersByNameExcludingUsersAlreadyInDirectConversation(userName, userRequesting, users);
     }
 
     private Optional<String> getIdentityKey(HttpServletRequest request){
@@ -80,17 +84,5 @@ public class UserFinder {
             if(user.getId() == userId) return Optional.of(user);
         }
         return Optional.empty();
-    }
-
-    private List<User> findUsersByStringContainedInTheName(
-            String userName, List<User> users){
-
-        List<User> usersCompatible = new ArrayList<>();
-        for(User user : users){
-            if(user.getName().toLowerCase().contains(userName.toLowerCase())) {
-                usersCompatible.add(user);
-            }
-        }
-        return usersCompatible;
     }
 }

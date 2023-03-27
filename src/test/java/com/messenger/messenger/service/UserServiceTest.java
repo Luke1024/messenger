@@ -3,7 +3,7 @@ package com.messenger.messenger.service;
 import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.entity.User;
 import com.messenger.messenger.service.utils.Settings;
-import com.messenger.messenger.service.utils.UserFinder;
+import com.messenger.messenger.service.utils.userfinder.UserFinder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;

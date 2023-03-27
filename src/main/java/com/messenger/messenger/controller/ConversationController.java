@@ -97,9 +97,7 @@ public class ConversationController {
     public ResponseEntity<Boolean> addConversation(HttpServletRequest request, @RequestBody List<UserDto> userDtos){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
-            logger.info(userDtos.stream().map(user -> user.getUserName()).collect(Collectors.joining(", ")));
             List<User> userFound = userService.findUsersByDto(userDtos);
-            logger.info(userFound.stream().map(user -> user.getName()).collect(Collectors.joining(", ")));
             return ResponseEntity.ok(conversationService.addConversation(userOptional.get(), userFound));
         } else {
             return ResponseEntity.ok(false);

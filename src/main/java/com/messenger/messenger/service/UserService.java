@@ -5,7 +5,7 @@ import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.User;
 import com.messenger.messenger.service.utils.Settings;
 import com.messenger.messenger.service.utils.TokenGenerator;
-import com.messenger.messenger.service.utils.UserFinder;
+import com.messenger.messenger.service.utils.userfinder.UserFinder;
 import com.messenger.messenger.service.utils.temp.DataGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +39,8 @@ public class UserService {
 
     public List<User> users = new ArrayList<>();
 
-    public List<UserDto> findUsersByNameToDto(String userName){
-        return userFinder.findUsersByNameToDto(userName, users);
+    public List<User> findUsersByNameExcludingUsersAlreadyInDirectConversation(String userName, User userRequesting){
+        return userFinder.findUsersByNameExcludingUsersAlreadyInDirectConversation(userName, userRequesting, users);
     }
 
     public Optional<User> findUserByHttpRequest(HttpServletRequest request){

@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:4200/",allowCredentials = "true")
 @RestController
@@ -50,7 +51,8 @@ public class UserController {
     public ResponseEntity<List<UserDto>> findUser(@PathVariable String userName, HttpServletRequest request){
         Optional<User> userOptional = userService.findUserByHttpRequest(request);
         if (userOptional.isPresent()) {
-            return ResponseEntity.ok(userService.findUsersByNameToDto(userName));
+            List<User> usersFound = userService.findUsersByNameExcludingUsersAlreadyInDirectConversation(userName, userOptional.get());
+            return ResponseEntity.ok(usersFound.stream().map(user -> user.getDto()).collect(Collectors.toList()));
         } else {
             return ResponseEntity.ok(new ArrayList<>());
         }
