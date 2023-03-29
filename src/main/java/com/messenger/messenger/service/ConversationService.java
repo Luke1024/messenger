@@ -64,7 +64,7 @@ public class ConversationService {
         return messageSender.send(userRequesting, sendMessageDto);
     }
 
-    public boolean addConversation(User userCreating, List<User> usersForConversationCreation){
+    public AddConversationResponse addConversation(User userCreating, List<User> usersForConversationCreation){
         return conversationAdder.addConversation(userCreating, usersForConversationCreation, conversations);
     }
 

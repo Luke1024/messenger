@@ -93,13 +93,13 @@ public class ConversationController {
     }
 
     @PostMapping(value = "/addConversation")
-    public ResponseEntity<Boolean> addConversation(HttpServletRequest request, @RequestBody List<UserDto> userDtos){
+    public AddConversationResponse addConversation(HttpServletRequest request, @RequestBody List<UserDto> userDtos){
         Optional<User> userOptional = authorize(request);
         if(userOptional.isPresent()){
             List<User> userFound = userService.findUsersByDto(userDtos);
-            return ResponseEntity.ok(conversationService.addConversation(userOptional.get(), userFound));
+            return conversationService.addConversation(userOptional.get(), userFound);
         } else {
-            return ResponseEntity.ok(false);
+            return new AddConversationResponse(false, "");
         }
     }
 

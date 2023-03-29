@@ -35,7 +35,7 @@ public class ConversationAdderTest {
         List<User> usersForConversationCreation = new ArrayList<>();
         usersForConversationCreation.addAll(Arrays.asList(bob, rob));
 
-        Assert.assertTrue(conversationAdder.addConversation(tom, usersForConversationCreation, conversationDatabase));
+        Assert.assertTrue(conversationAdder.addConversation(tom, usersForConversationCreation, conversationDatabase).isStatus());
 
         //conversation added
         Assert.assertTrue(conversationDatabase.size()==1);
@@ -51,24 +51,24 @@ public class ConversationAdderTest {
         }
 
         //create conversasion with the same composition once more
-        Assert.assertFalse(conversationAdder.addConversation(tom, usersForConversationCreation, conversationDatabase));
+        Assert.assertFalse(conversationAdder.addConversation(tom, usersForConversationCreation, conversationDatabase).isStatus());
 
         //create user with the same user creating and requesting conversation creation
         List<User> selfConversation = new ArrayList<>();
         selfConversation.add(tom);
 
-        Assert.assertFalse(conversationAdder.addConversation(tom, selfConversation, conversationDatabase));
+        Assert.assertFalse(conversationAdder.addConversation(tom, selfConversation, conversationDatabase).isStatus());
 
         //second example of duplicate user
         List<User> multipliedUserConversation = new ArrayList<>();
         multipliedUserConversation.addAll(Arrays.asList(tom, rob, rob, martin));
 
-        Assert.assertFalse(conversationAdder.addConversation(bob, multipliedUserConversation, conversationDatabase));
+        Assert.assertFalse(conversationAdder.addConversation(bob, multipliedUserConversation, conversationDatabase).isStatus());
 
         List<User> directConversation = new ArrayList<>(Arrays.asList(martin));
 
         //create direct conversation
-        Assert.assertTrue(conversationAdder.addConversation(bob, directConversation, conversationDatabase));
+        Assert.assertTrue(conversationAdder.addConversation(bob, directConversation, conversationDatabase).isStatus());
         Assert.assertTrue(conversationDatabase.get(1).isDirect());
 
         for(int i=0; i<conversationDatabase.size(); i++){

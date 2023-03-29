@@ -58,13 +58,13 @@ public class ConversationServiceTest {
         List<User> firstConversation = new ArrayList<>();
         firstConversation.add(newUser2);
         firstConversation.add(newUser3);
-        Assert.assertTrue(conversationService.addConversation(newUser1 ,firstConversation));
+        Assert.assertTrue(conversationService.addConversation(newUser1 ,firstConversation).isStatus());
 
         List<User> secondConversation = new ArrayList<>();
         secondConversation.add(newUser1);
         secondConversation.add(newUser3);
         //creating conversation with the same users should be blocked
-        Assert.assertFalse(conversationService.addConversation(newUser2, secondConversation));
+        Assert.assertFalse(conversationService.addConversation(newUser2, secondConversation).isStatus());
 
         //check created conversations
         Assert.assertTrue(conversationService.findById(0).isPresent());
