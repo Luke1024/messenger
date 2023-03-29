@@ -103,8 +103,6 @@ public class MessageAcquirerTest {
         MessageBatch messageBatch1 = new MessageBatch(0);
         MessageBatch messageBatch2 = new MessageBatch(1);
 
-        Assert.assertTrue(messageAcquirer.loadLastBatch(data.tom,0).isEmpty());
-
         data.main.getMessageBatches().addAll(Arrays.asList(messageBatch1, messageBatch2));
 
         Optional<MessageBatch> messageBatchOptional = messageAcquirer.loadLastBatch(data.tom,0);
@@ -116,14 +114,11 @@ public class MessageAcquirerTest {
     public void loadBatch(){
         DataHolder data = createData();
 
-        MessageBatch messageBatch1 = new MessageBatch(0);
         MessageBatch messageBatch2 = new MessageBatch(1);
 
-        Assert.assertTrue(messageAcquirer.loadLastBatch(data.tom,0).isEmpty());
+        data.main.getMessageBatches().addAll(Arrays.asList(messageBatch2));
 
-        data.main.getMessageBatches().addAll(Arrays.asList(messageBatch1, messageBatch2));
-
-        Assert.assertTrue(messageAcquirer.loadBatch(data.tom,0,0).get().getId()==0);
-        Assert.assertTrue(messageAcquirer.loadBatch(data.tom,0,1).get().getId()==1);
+        Assert.assertEquals(0,messageAcquirer.loadBatch(data.tom,0,0).get().getId());
+        Assert.assertEquals(1,messageAcquirer.loadBatch(data.tom,0,1).get().getId());
     }
 }

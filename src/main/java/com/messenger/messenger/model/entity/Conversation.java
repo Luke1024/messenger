@@ -13,6 +13,7 @@ public class Conversation {
         this.id = id;
         this.usersInConversation = users;
         this.direct = direct;
+        messageBatches.add(new MessageBatch(0));
     }
 
     public long getId() {
