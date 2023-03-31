@@ -6,12 +6,12 @@ import java.util.List;
 
 public class MessageBatchDay {
     private long id;
-    private LocalDate localDate;
+    private LocalDate send;
     private List<Message> messages = new ArrayList<>();
 
-    public MessageBatchDay(long id, LocalDate localDate) {
+    public MessageBatchDay(long id, LocalDate send) {
         this.id = id;
-        this.localDate = localDate;
+        this.send = send;
     }
 
     public long getId() {
@@ -22,7 +22,7 @@ public class MessageBatchDay {
         return messages;
     }
 
-    public LocalDate getLocalDate() {
-        return localDate;
+    public LocalDate getSend() {
+        return send;
     }
 }

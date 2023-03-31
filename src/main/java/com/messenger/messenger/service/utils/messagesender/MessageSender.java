@@ -1,4 +1,4 @@
-package com.messenger.messenger.service.utils;
+package com.messenger.messenger.service.utils.messagesender;
 
 import com.messenger.messenger.model.dto.SendMessageDto;
 import com.messenger.messenger.model.entity.*;
@@ -7,37 +7,20 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class MessageSender {
 
-    public boolean send(User userRequesting, SendMessageDto sendMessageDto){
-        Optional<Conversation> optionalConversation = findById(sendMessageDto.getConversationId(),
-                getUserConversations(userRequesting));
+    private CurrentBatchRetriever currentBatchRetriever = new CurrentBatchRetriever();
 
-        if(optionalConversation.isPresent()){
-            Message newMessage = new Message(
-                    sendMessageDto.getContent(),
-                    LocalTime.now(),
-                    userRequesting,
-                    optionalConversation.get());
-            addMessage(optionalConversation.get(), newMessage);
-            return true;
-        } else return false;
-    }
-
-    private List<Conversation> getUserConversations(User user){
-        return user.getConversations().entrySet().stream()
-                .map(entry -> entry.getKey()).collect(Collectors.toList());
-    }
-
-    private Optional<Conversation> findById(long id, List<Conversation> conversations){
-        for(Conversation conversation : conversations){
-            if(conversation.getId() == id) return Optional.of(conversation);
-        }
-        return Optional.empty();
+    public boolean send(User userRequesting, SendMessageDto sendMessageDto, Conversation conversation){
+        Message newMessage = new Message(
+                sendMessageDto.getContent(),
+                LocalTime.now(),
+                userRequesting,
+                conversation);
+        addMessage(conversation, newMessage);
+        return true;
     }
 
     private void addMessage(Conversation conversation, Message newMessage){
@@ -47,24 +30,7 @@ public class MessageSender {
     }
 
     private MessageBatchDay getCurrentBatch(List<MessageBatchDay> messageBatchDays){
-        if(messageBatchDays.isEmpty()){
-            MessageBatchDay newMessageBatchDay = new MessageBatchDay(0, LocalDate.now());
-            messageBatchDays.add(newMessageBatchDay);
-            return newMessageBatchDay;
-        }
-        LocalDate today = LocalDate.now();
-        MessageBatchDay lastMessageBatch = messageBatchDays.get(messageBatchDays.size()-1);
-        if(lastMessageBatch.getLocalDate().isEqual(today)){
-            return lastMessageBatch;
-        } else {
-            MessageBatchDay newBatch = new MessageBatchDay(generateBatchId(messageBatchDays), LocalDate.now());
-            messageBatchDays.add(newBatch);
-            return newBatch;
-        }
-    }
-
-    private long generateBatchId(List<MessageBatchDay> messageBatchDays){
-        return messageBatchDays.get(messageBatchDays.size()-1).getId()+1;
+        return currentBatchRetriever.getBatch(messageBatchDays, LocalDate.now());
     }
 
     private void addMessageToBatch(MessageBatchDay messageBatchDay, Message message){

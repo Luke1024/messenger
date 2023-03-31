@@ -6,7 +6,7 @@ import com.messenger.messenger.service.mapper.ConversationMapper;
 import com.messenger.messenger.service.mapper.MessageMapper;
 import com.messenger.messenger.service.utils.ConversationAdder;
 import com.messenger.messenger.service.utils.MessageAcquirer;
-import com.messenger.messenger.service.utils.MessageSender;
+import com.messenger.messenger.service.utils.messagesender.MessageSender;
 import com.messenger.messenger.service.utils.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,7 +61,12 @@ public class ConversationService {
     }
 
     public boolean send(User userRequesting, SendMessageDto sendMessageDto){
-        return messageSender.send(userRequesting, sendMessageDto);
+        Optional<Conversation> optionalConversation = findById(sendMessageDto.getConversationId());
+        if(optionalConversation.isPresent()){
+            return messageSender.send(userRequesting, sendMessageDto, optionalConversation.get());
+        } else {
+            return false;
+        }
     }
 
     public AddConversationResponse addConversation(User userCreating, List<User> usersForConversationCreation){

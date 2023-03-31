@@ -13,14 +13,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class ConversationAdder {
 
     @Autowired
     private ConversationDuplicationDetector duplicatorDetector;
-    private Logger logger = LoggerFactory.getLogger(ConversationAdder.class);
     private String errorGeneral = "Conversation creation error. ";
     private String noUsers = "There is no users for conversation creation.";
     private String notUniqueUsers = "Users are not unique.";
@@ -37,14 +35,12 @@ public class ConversationAdder {
 
         if(usersForConversationCreationCloned.isEmpty()){
             String response = errorGeneral + noUsers;
-            logger.info(response);
             return new AddConversationResponse(false, response);
         }
 
         usersForConversationCreationCloned.add(userCreating);
         if( ! isAllUsersUnique(usersForConversationCreationCloned)){
             String response = errorGeneral + notUniqueUsers;
-            logger.info(response);
             return new AddConversationResponse(false, response);
         }
 
@@ -57,7 +53,6 @@ public class ConversationAdder {
             } else {
                 response = errorGeneral + compositionAlreadyExists;
             }
-            logger.info(response);
             return new AddConversationResponse(false, response);
         }
 
@@ -69,16 +64,12 @@ public class ConversationAdder {
 
         propagateConversationToUsers(newConversation,newConversation.getUsersInConversation());
         conversations.add(newConversation);
-        logger.info("Succesfully added conversation : " + newConversation.getUsersInConversation()
-                .stream().map(user -> user.toString()).collect(Collectors.joining(", ")));
         return new AddConversationResponse(true, "");
     }
 
     private boolean isAllUsersUnique(List<User> usersForConversationCreation){
-        logger.info(usersForConversationCreation.stream().map(user -> user.getName()).collect(Collectors.joining(", ")));
         Set<User> uniqueUsers = new HashSet<>();
         uniqueUsers.addAll(usersForConversationCreation);
-        logger.info(uniqueUsers.stream().map(user -> user.getName()).collect(Collectors.joining(", ")));
         return usersForConversationCreation.size() == uniqueUsers.size();
     }
 

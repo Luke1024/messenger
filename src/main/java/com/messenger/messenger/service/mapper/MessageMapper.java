@@ -31,7 +31,10 @@ public class MessageMapper {
 
     public Optional<BatchDto> mapToBatchDtoOptionalFromMessageBatchOptional(Optional<MessageBatchDay> messageBatch, User userRequesting){
         if(messageBatch.isPresent()){
-            return Optional.of(new BatchDto(messageBatch.get().getId(), mapToDtoList(messageBatch.get().getMessages(), userRequesting)));
+            return Optional.of(new BatchDto(messageBatch.get().getId(),
+                    messageBatch.get().getSend().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)),
+                    mapToDtoList(messageBatch.get().getMessages(),
+                            userRequesting)));
         } else {
             return Optional.empty();
         }

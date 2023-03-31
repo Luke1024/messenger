@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -90,7 +92,7 @@ public class MessageAcquirerTest {
 
         //sending message to "empty" conversation
         data.tom.getConversations().get(data.empty).getWaitingMessages().add(new Message(
-                "Hello, hello.", LocalDateTime.now(), data.rob, data.empty));
+                "Hello, hello.", LocalTime.now(), data.rob, data.empty));
 
         Assert.assertTrue(messageAcquirer.getNewMessages(data.tom,0).size()==0);
         Assert.assertTrue(messageAcquirer.getNewMessages(data.tom,1).size()==1);
@@ -100,8 +102,8 @@ public class MessageAcquirerTest {
     public void loadLastBatch(){
         DataHolder data = createData();
 
-        MessageBatchDay messageBatchDay1 = new MessageBatchDay(0);
-        MessageBatchDay messageBatchDay2 = new MessageBatchDay(1);
+        MessageBatchDay messageBatchDay1 = new MessageBatchDay(0, LocalDate.now());
+        MessageBatchDay messageBatchDay2 = new MessageBatchDay(1, LocalDate.now());
 
         data.main.getMessageBatchDays().addAll(Arrays.asList(messageBatchDay1, messageBatchDay2));
 
@@ -114,9 +116,10 @@ public class MessageAcquirerTest {
     public void loadBatch(){
         DataHolder data = createData();
 
-        MessageBatchDay messageBatchDay2 = new MessageBatchDay(1);
+        MessageBatchDay messageBatchDay1 = new MessageBatchDay(0, LocalDate.now());
+        MessageBatchDay messageBatchDay2 = new MessageBatchDay(1, LocalDate.now());
 
-        data.main.getMessageBatchDays().addAll(Arrays.asList(messageBatchDay2));
+        data.main.getMessageBatchDays().addAll(Arrays.asList(messageBatchDay1, messageBatchDay2));
 
         Assert.assertEquals(0,messageAcquirer.loadBatch(data.tom,0,0).get().getId());
         Assert.assertEquals(1,messageAcquirer.loadBatch(data.tom,0,1).get().getId());

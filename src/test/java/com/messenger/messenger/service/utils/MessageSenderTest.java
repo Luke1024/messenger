@@ -4,6 +4,7 @@ import com.messenger.messenger.model.dto.SendMessageDto;
 import com.messenger.messenger.model.entity.Conversation;
 import com.messenger.messenger.model.entity.ConversationStatus;
 import com.messenger.messenger.model.entity.User;
+import com.messenger.messenger.service.utils.messagesender.MessageSender;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,9 +39,6 @@ public class MessageSenderTest {
 
     @Autowired
     private MessageSender messageSender;
-
-    @Autowired
-    private Settings settings;
 
     public DataHolder createData(){
         User tom = new User("Tom", "", "");
@@ -78,7 +76,7 @@ public class MessageSenderTest {
         String message = "Hello everyone.";
         String message2 = "Hi there";
 
-        messageSender.send(data.tom, new SendMessageDto(0, message));
+        messageSender.send(data.tom, new SendMessageDto(0, message), data.main);
 
         ConversationStatus tomMainStatus = data.tom.getConversations().get(data.main);
         ConversationStatus bobMainStatus = data.bob.getConversations().get(data.main);
@@ -98,7 +96,7 @@ public class MessageSenderTest {
         Assert.assertTrue(robMainStatus.getNotificationCount()==1);
 
         //continue conversation
-        messageSender.send(data.bob, new SendMessageDto(0, message2));
+        messageSender.send(data.bob, new SendMessageDto(0, message2), data.main);
 
         Assert.assertTrue(tomMainStatus.isThereSomethingNew());
         Assert.assertTrue(tomMainStatus.getWaitingMessages().size()==2);
@@ -111,13 +109,5 @@ public class MessageSenderTest {
         Assert.assertTrue(robMainStatus.isThereSomethingNew());
         Assert.assertTrue(robMainStatus.getWaitingMessages().size()==2);
         Assert.assertTrue(robMainStatus.getNotificationCount()==2);
-
-        //check batching
-        for(int i=0; i<settings.messageCountInBatch; i++) {
-            messageSender.send(data.tom, new SendMessageDto(0, message));
-        }
-
-        Assert.assertTrue(data.main.getMessageBatchDays().size()==2);
-        Assert.assertTrue(data.main.getMessageBatchDays().get(1).getMessages().size()==2);
     }
 }
