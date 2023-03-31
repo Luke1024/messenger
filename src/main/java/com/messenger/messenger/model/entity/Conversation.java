@@ -7,13 +7,13 @@ public class Conversation {
     private long id;
     private List<User> usersInConversation;
     private boolean direct;
-    private List<MessageBatch> messageBatches = new ArrayList<>();
+    private List<MessageBatchDay> messageBatchDays = new ArrayList<>();
 
     public Conversation(long id, List<User> users, boolean direct) {
         this.id = id;
         this.usersInConversation = users;
         this.direct = direct;
-        messageBatches.add(new MessageBatch(0));
+        messageBatchDays.add(new MessageBatchDay(0));
     }
 
     public long getId() {
@@ -29,7 +29,7 @@ public class Conversation {
     }
 
 
-    public List<MessageBatch> getMessageBatches() {
-        return messageBatches;
+    public List<MessageBatchDay> getMessageBatchDays() {
+        return messageBatchDays;
     }
 }

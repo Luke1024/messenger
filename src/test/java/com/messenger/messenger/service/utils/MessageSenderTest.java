@@ -117,7 +117,7 @@ public class MessageSenderTest {
             messageSender.send(data.tom, new SendMessageDto(0, message));
         }
 
-        Assert.assertTrue(data.main.getMessageBatches().size()==2);
-        Assert.assertTrue(data.main.getMessageBatches().get(1).getMessages().size()==2);
+        Assert.assertTrue(data.main.getMessageBatchDays().size()==2);
+        Assert.assertTrue(data.main.getMessageBatchDays().get(1).getMessages().size()==2);
     }
 }

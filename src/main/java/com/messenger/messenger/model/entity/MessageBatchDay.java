@@ -1,13 +1,15 @@
 package com.messenger.messenger.model.entity;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MessageBatch {
+public class MessageBatchDay {
     private long id;
+    private LocalDate localDate = LocalDate.now();
     private List<Message> messages = new ArrayList<>();
 
-    public MessageBatch(long id) {
+    public MessageBatchDay(long id) {
         this.id = id;
     }
 
@@ -17,5 +19,9 @@ public class MessageBatch {
 
     public List<Message> getMessages() {
         return messages;
+    }
+
+    public LocalDate getLocalDate() {
+        return localDate;
     }
 }

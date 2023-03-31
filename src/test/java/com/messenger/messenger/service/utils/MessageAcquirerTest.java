@@ -100,12 +100,12 @@ public class MessageAcquirerTest {
     public void loadLastBatch(){
         DataHolder data = createData();
 
-        MessageBatch messageBatch1 = new MessageBatch(0);
-        MessageBatch messageBatch2 = new MessageBatch(1);
+        MessageBatchDay messageBatchDay1 = new MessageBatchDay(0);
+        MessageBatchDay messageBatchDay2 = new MessageBatchDay(1);
 
-        data.main.getMessageBatches().addAll(Arrays.asList(messageBatch1, messageBatch2));
+        data.main.getMessageBatchDays().addAll(Arrays.asList(messageBatchDay1, messageBatchDay2));
 
-        Optional<MessageBatch> messageBatchOptional = messageAcquirer.loadLastBatch(data.tom,0);
+        Optional<MessageBatchDay> messageBatchOptional = messageAcquirer.loadLastBatch(data.tom,0);
 
         Assert.assertTrue(messageBatchOptional.get().getId()==1);
     }
@@ -114,9 +114,9 @@ public class MessageAcquirerTest {
     public void loadBatch(){
         DataHolder data = createData();
 
-        MessageBatch messageBatch2 = new MessageBatch(1);
+        MessageBatchDay messageBatchDay2 = new MessageBatchDay(1);
 
-        data.main.getMessageBatches().addAll(Arrays.asList(messageBatch2));
+        data.main.getMessageBatchDays().addAll(Arrays.asList(messageBatchDay2));
 
         Assert.assertEquals(0,messageAcquirer.loadBatch(data.tom,0,0).get().getId());
         Assert.assertEquals(1,messageAcquirer.loadBatch(data.tom,0,1).get().getId());

@@ -2,19 +2,16 @@ package com.messenger.messenger.service.utils;
 
 import com.messenger.messenger.model.dto.SendMessageDto;
 import com.messenger.messenger.model.entity.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 public class MessageSender {
-
-    @Autowired
-    private Settings settings;
 
     public boolean send(User userRequesting, SendMessageDto sendMessageDto){
         Optional<Conversation> optionalConversation = findById(sendMessageDto.getConversationId(),
@@ -23,7 +20,7 @@ public class MessageSender {
         if(optionalConversation.isPresent()){
             Message newMessage = new Message(
                     sendMessageDto.getContent(),
-                    LocalDateTime.now(),
+                    LocalTime.now(),
                     userRequesting,
                     optionalConversation.get());
             addMessage(optionalConversation.get(), newMessage);
@@ -44,43 +41,38 @@ public class MessageSender {
     }
 
     private void addMessage(Conversation conversation, Message newMessage){
-        MessageBatch currenctBatch = getCurrentBatch(conversation.getMessageBatches());
+        MessageBatchDay currenctBatch = getCurrentBatch(conversation.getMessageBatchDays());
         addMessageToBatch(currenctBatch, newMessage);
         informUsers(newMessage, conversation.getUsersInConversation(), conversation);
     }
 
-    private MessageBatch getCurrentBatch(List<MessageBatch> messageBatches){
-        if(messageBatches.isEmpty()){
-            MessageBatch newMessageBatch = new MessageBatch(0);
-            messageBatches.add(newMessageBatch);
-            return newMessageBatch;
-        }
-        if( ! messageBatches.isEmpty()){
-            MessageBatch lastMessageBatch = messageBatches.get(messageBatches.size()-1);
-            if(lastMessageBatch.getMessages().size() > settings.messageCountInBatch-1){
-                MessageBatch newMessageBatch = new MessageBatch(generateBatchId(messageBatches));
-                messageBatches.add(newMessageBatch);
-                return newMessageBatch;
-            }
-        }
-        return messageBatches.get(messageBatches.size()-1);
-    }
-
-    private long generateBatchId(List<MessageBatch> messageBatches){
-        return messageBatches.get(messageBatches.size()-1).getId()+1;
-    }
-
-    private void addMessageToBatch(MessageBatch messageBatch, Message message){
-        if(messageBatch.getMessages().isEmpty()){
-            message.setId(0);
-            message.setMessageBatch(messageBatch);
+    private MessageBatchDay getCurrentBatch(List<MessageBatchDay> messageBatchDays){
+        LocalDate today = LocalDate.now();
+        MessageBatchDay lastMessageBatch = messageBatchDays.get(messageBatchDays.size()-1);
+        if(lastMessageBatch.getLocalDate().isEqual(today)){
+            return lastMessageBatch;
         } else {
-            List<Message> messages = messageBatch.getMessages();
+            MessageBatchDay newBatch = new MessageBatchDay(generateBatchId(messageBatchDays));
+            messageBatchDays.add(newBatch);
+            return newBatch;
+        }
+    }
+
+    private long generateBatchId(List<MessageBatchDay> messageBatchDays){
+        return messageBatchDays.get(messageBatchDays.size()-1).getId()+1;
+    }
+
+    private void addMessageToBatch(MessageBatchDay messageBatchDay, Message message){
+        if(messageBatchDay.getMessages().isEmpty()){
+            message.setId(0);
+            message.setMessageBatchDay(messageBatchDay);
+        } else {
+            List<Message> messages = messageBatchDay.getMessages();
             long newId = messages.get(messages.size()-1).getId() + 1;
             message.setId(newId);
-            message.setMessageBatch(messageBatch);
+            message.setMessageBatchDay(messageBatchDay);
         }
-        messageBatch.getMessages().add(message);
+        messageBatchDay.getMessages().add(message);
     }
 
     private void informUsers(Message message, List<User> usersInConversation, Conversation conversation){

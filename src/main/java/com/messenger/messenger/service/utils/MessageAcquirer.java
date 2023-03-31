@@ -48,7 +48,7 @@ public class MessageAcquirer {
         return new ArrayList<>();
     }
 
-    public Optional<MessageBatch> loadLastBatch(User user, long conversationId){
+    public Optional<MessageBatchDay> loadLastBatch(User user, long conversationId){
         Optional<Conversation> optionalConversation = findById(conversationId, getUserConversations(user));
         if(optionalConversation.isPresent()){
             return getLastMessageBatch(user, optionalConversation.get());
@@ -57,7 +57,7 @@ public class MessageAcquirer {
         }
     }
 
-    public Optional<MessageBatch> loadBatch(User userRequesting, long conversationId, int batchId) {
+    public Optional<MessageBatchDay> loadBatch(User userRequesting, long conversationId, int batchId) {
         Optional<Conversation> optionalConversation = findById(conversationId, getUserConversations(userRequesting));
         if (optionalConversation.isPresent()) {
             return getMessageBatch(userRequesting, batchId, optionalConversation.get());
@@ -77,30 +77,30 @@ public class MessageAcquirer {
         return Optional.empty();
     }
 
-    private Optional<MessageBatch> getMessageBatch(User user, int batchIndex, Conversation conversation) {
+    private Optional<MessageBatchDay> getMessageBatch(User user, int batchIndex, Conversation conversation) {
         ConversationStatus conversationStatus = user.getConversations().get(conversation);
         if(conversationStatus != null) {
-            List<MessageBatch> messageBatches = conversation.getMessageBatches();
-            if (isBatchIndexInRange(batchIndex, messageBatches)) {
+            List<MessageBatchDay> messageBatchDays = conversation.getMessageBatchDays();
+            if (isBatchIndexInRange(batchIndex, messageBatchDays)) {
                 clearConversationStatus(conversationStatus);
-                return Optional.of(messageBatches.get(batchIndex));
+                return Optional.of(messageBatchDays.get(batchIndex));
             }
         }
         return Optional.empty();
     }
 
-    private boolean isBatchIndexInRange(int batchIndex, List<MessageBatch> messageBatches){
-        return batchIndex >= 0 && messageBatches.size() > batchIndex;
+    private boolean isBatchIndexInRange(int batchIndex, List<MessageBatchDay> messageBatchDays){
+        return batchIndex >= 0 && messageBatchDays.size() > batchIndex;
     }
 
-    private Optional<MessageBatch> getLastMessageBatch(User user, Conversation conversation){
+    private Optional<MessageBatchDay> getLastMessageBatch(User user, Conversation conversation){
         ConversationStatus conversationStatus = user.getConversations().get(conversation);
         if(conversationStatus != null){
             clearConversationStatus(conversationStatus);
             conversationStatus.setSomethingChanged(true);
-            List<MessageBatch> messageBatches = conversation.getMessageBatches();
-            if( ! messageBatches.isEmpty()){
-                return Optional.of(messageBatches.get(messageBatches.size()-1));
+            List<MessageBatchDay> messageBatchDays = conversation.getMessageBatchDays();
+            if( ! messageBatchDays.isEmpty()){
+                return Optional.of(messageBatchDays.get(messageBatchDays.size()-1));
             }
         }
         return Optional.empty();
