@@ -47,12 +47,17 @@ public class MessageSender {
     }
 
     private MessageBatchDay getCurrentBatch(List<MessageBatchDay> messageBatchDays){
+        if(messageBatchDays.isEmpty()){
+            MessageBatchDay newMessageBatchDay = new MessageBatchDay(0, LocalDate.now());
+            messageBatchDays.add(newMessageBatchDay);
+            return newMessageBatchDay;
+        }
         LocalDate today = LocalDate.now();
         MessageBatchDay lastMessageBatch = messageBatchDays.get(messageBatchDays.size()-1);
         if(lastMessageBatch.getLocalDate().isEqual(today)){
             return lastMessageBatch;
         } else {
-            MessageBatchDay newBatch = new MessageBatchDay(generateBatchId(messageBatchDays));
+            MessageBatchDay newBatch = new MessageBatchDay(generateBatchId(messageBatchDays), LocalDate.now());
             messageBatchDays.add(newBatch);
             return newBatch;
         }

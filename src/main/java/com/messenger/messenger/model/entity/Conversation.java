@@ -13,7 +13,6 @@ public class Conversation {
         this.id = id;
         this.usersInConversation = users;
         this.direct = direct;
-        messageBatchDays.add(new MessageBatchDay(0));
     }
 
     public long getId() {
