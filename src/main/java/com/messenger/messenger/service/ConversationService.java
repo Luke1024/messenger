@@ -2,8 +2,8 @@ package com.messenger.messenger.service;
 
 import com.messenger.messenger.model.dto.*;
 import com.messenger.messenger.model.entity.*;
-import com.messenger.messenger.service.mapper.ConversationMapper;
-import com.messenger.messenger.service.mapper.MessageMapper;
+import com.messenger.messenger.mapper.ConversationMapper;
+import com.messenger.messenger.mapper.MessageMapper;
 import com.messenger.messenger.service.utils.ConversationAdder;
 import com.messenger.messenger.service.utils.MessageAcquirer;
 import com.messenger.messenger.service.utils.messagesender.MessageSender;

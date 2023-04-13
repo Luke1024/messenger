@@ -1,4 +1,4 @@
-package com.messenger.messenger.service.mapper;
+package com.messenger.messenger.mapper;
 
 import com.messenger.messenger.model.dto.BatchDto;
 import com.messenger.messenger.model.dto.MessageDto;
@@ -32,7 +32,7 @@ public class MessageMapper {
     public Optional<BatchDto> mapToBatchDtoOptionalFromMessageBatchOptional(Optional<MessageBatchDay> messageBatch, User userRequesting){
         if(messageBatch.isPresent()){
             return Optional.of(new BatchDto(messageBatch.get().getId(),
-                    messageBatch.get().getSend().format(DateTimeFormatter.ofLocalizedTime(FormatStyle.MEDIUM)),
+                    messageBatch.get().getSend().toString(),
                     mapToDtoList(messageBatch.get().getMessages(),
                             userRequesting)));
         } else {

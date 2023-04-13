@@ -1,4 +1,4 @@
-package com.messenger.messenger.service.mapper;
+package com.messenger.messenger.mapper;
 
 import com.messenger.messenger.model.dto.ConversationStatusDto;
 import com.messenger.messenger.model.entity.Conversation;
