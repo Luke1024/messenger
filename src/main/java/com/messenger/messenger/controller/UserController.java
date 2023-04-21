@@ -1,5 +1,6 @@
 package com.messenger.messenger.controller;
 
+import com.messenger.messenger.model.dto.AuthorizationResponseDto;
 import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.User;
@@ -34,17 +35,13 @@ public class UserController {
     }
 
     @PostMapping(value = "/register")
-    public ResponseEntity<Boolean> registerUser(@RequestBody UserDataDto userDataDto){
-        if(userService.register(userDataDto)){
-            return ResponseEntity.ok(true);
-        } else return ResponseEntity.ok(false);
+    public AuthorizationResponseDto registerUser(@RequestBody UserDataDto userDataDto){
+        return userService.register(userDataDto);
     }
 
     @PostMapping(value = "/login")
-    public ResponseEntity<Boolean> loginUser(@RequestBody UserDataDto userDataDto, HttpServletResponse response){
-        if(userService.loginUser(userDataDto, response)){
-            return ResponseEntity.ok(true);
-        } else return ResponseEntity.ok(false);
+    public AuthorizationResponseDto loginUser(@RequestBody UserDataDto userDataDto, HttpServletResponse response){
+        return userService.loginUser(userDataDto, response);
     }
 
     @GetMapping(value = "/findUser/{userName}")

@@ -59,7 +59,7 @@ public class UserServiceTest {
 
         userService.register(newUserDataDto);
         //check if user with the same name could be registered again
-        Assert.assertFalse(userService.register(newUserDataDto));
+        Assert.assertFalse(userService.register(newUserDataDto).isStatus());
 
         Field users = userService.getClass().getDeclaredField("users");
 
@@ -78,10 +78,10 @@ public class UserServiceTest {
         MockHttpServletResponse response = new MockHttpServletResponse();
 
         //login without register
-        Assert.assertFalse(userService.loginUser(newUserDataDto,response));
+        Assert.assertFalse(userService.loginUser(newUserDataDto,response).isStatus());
         //register
-        Assert.assertTrue(userService.register(newUserDataDto));
-        Assert.assertTrue(userService.loginUser(newUserDataDto, response));
+        Assert.assertTrue(userService.register(newUserDataDto).isStatus());
+        Assert.assertTrue(userService.loginUser(newUserDataDto, response).isStatus());
 
         Assert.assertTrue(response.getCookie(settings.authKey) != null);
 

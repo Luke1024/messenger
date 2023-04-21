@@ -1,5 +1,6 @@
 package com.messenger.messenger.service;
 
+import com.messenger.messenger.model.dto.AuthorizationResponseDto;
 import com.messenger.messenger.model.dto.UserDataDto;
 import com.messenger.messenger.model.dto.UserDto;
 import com.messenger.messenger.model.entity.User;
@@ -47,7 +48,7 @@ public class UserService {
         return userFinder.findUserByHttpRequest(request, users);
     }
 
-    public boolean register(UserDataDto userDataDto){
+    public AuthorizationResponseDto register(UserDataDto userDataDto){
         if(isRegistrationAllowed(userDataDto)){
             logger.info("Registering user with name: " + userDataDto.getUserName()
                     + " and password: " + userDataDto.getPassword());
@@ -59,19 +60,21 @@ public class UserService {
             if(userDataDto.getUserName().equals("testUser")) {
                 dataGenerator.generateDataForUser(newUser, this);
             }
-            return true;
-        } else return false;
+            return new AuthorizationResponseDto(true,"");
+        } else {
+            return new AuthorizationResponseDto(false, "Try different user name.");
+        }
     }
 
-    public boolean loginUser(UserDataDto userDataDto, HttpServletResponse response){
+    public AuthorizationResponseDto loginUser(UserDataDto userDataDto, HttpServletResponse response){
         Optional<User> userOptional = userFinder.findByName(userDataDto.getUserName(), users);
         if(userOptional.isPresent()) {
             if (isPasswordValid(userOptional.get().getPassword(),userDataDto.getPassword())) {
                 addIdentityCookie(userOptional.get().getIdentityKey(),response);
-                return true;
+                return new AuthorizationResponseDto(true, "");
             }
         }
-        return false;
+        return new AuthorizationResponseDto(false, "Login credentials are incorrect.");
     }
 
     public List<User> findUsersByDto(List<UserDto> userDtos){
